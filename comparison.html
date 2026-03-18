@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ER+HER2- 早期復發高風險自費藥物對照表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { background-color: #f8fafc; font-family: 'Inter', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+        
+        .table-container { 
+            background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); 
+            overflow: hidden; border: 1px solid #f1f5f9; margin-bottom: 20px;
+        }
+        
+        /* 表格容器，支援平滑橫向滾動 */
+        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+        table { width: 100%; min-width: 900px; border-collapse: collapse; text-align: left; table-layout: fixed; }
+        
+        /* 欄位寬度設定：考量手機版容忍度，稍微微調比例 */
+        th:nth-child(1), td:nth-child(1) { width: 130px; } 
+        th:nth-child(2), td:nth-child(2) { width: 280px; } 
+        th:nth-child(3), td:nth-child(3) { width: 280px; } 
+        th:nth-child(4), td:nth-child(4) { width: 280px; } 
+
+        th, td { padding: 16px; border-bottom: 1px solid #f1f5f9; vertical-align: top; line-height: 1.6; }
+        th { background: #f8fafc; font-weight: 700; color: #475569; position: sticky; top: 0; z-index: 10; font-size: 1rem; border-bottom: 2px solid #e2e8f0; }
+        
+        /* 第一欄固定：加入陰影增加立體感 */
+        th:first-child, td:first-child { 
+            position: sticky; left: 0; background: #f8fafc; z-index: 20; 
+            font-weight: 700; color: #334155; border-right: 1px solid #e2e8f0; font-size: 0.95rem;
+        }
+        td:first-child { box-shadow: 2px 0 5px -2px rgba(0,0,0,0.05); }
+        th:first-child { z-index: 30; box-shadow: 2px 0 5px -2px rgba(0,0,0,0.05); }
+
+        tbody tr:hover td:not(:first-child) { background-color: #f8fafc; transition: background-color 0.2s; }
+
+        .badge { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; margin-bottom: 6px; margin-right: 4px; }
+        .badge-green { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-yellow { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
+        .badge-red { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .badge-gray { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+        .badge-purple { background: #f3e8ff; color: #6b21a8; border: 1px solid #e9d5ff; }
+
+        .data-list { list-style-type: none; padding: 0; margin: 0; font-size: 0.9rem; color: #475569; }
+        .data-list li { margin-bottom: 6px; padding-left: 14px; text-indent: -14px; }
+        .data-list li::before { content: "•"; color: #94a3b8; margin-right: 6px; }
+
+        .sub-list { margin-top: 4px; padding-left: 18px; text-indent: -14px; }
+        .sub-list li::before { content: "-"; color: #cbd5e1; margin-right: 6px; }
+
+        .highlight-text { font-weight: 700; color: #0f172a; }
+        .alert-text { font-weight: 700; color: #e11d48; } 
+        
+        .risk-label { display: inline-flex; align-items: center; font-weight: 700; color: #0369a1; background: #e0f2fe; border: 1px solid #bae6fd; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; margin-top: 6px; margin-bottom: 6px; }
+
+        .btn-group { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .action-btn { display: inline-flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 600; padding: 8px 16px; border-radius: 9999px; text-decoration: none; transition: 0.2s; cursor: pointer; border: 1px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .btn-back { color: #475569; background: white; }
+        .btn-back:hover { background: #f8fafc; color: #0f172a; }
+        .btn-print { color: #0f172a; background: #f1f5f9; border-color: #cbd5e1; }
+        .btn-print:hover { background: #e2e8f0; }
+        .btn-primary { color: white; background: #0ea5e9; border-color: #0284c7; }
+        .btn-primary:hover { background: #0284c7; }
+        
+        .section-header td { background-color: #f8fafc; color: #0f172a; font-weight: 700; border-top: 2px solid #e2e8f0; border-bottom: 2px solid #e2e8f0; }
+        .footer-section { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; font-size: 0.85rem; color: #64748b; line-height: 1.6; margin-bottom: 40px; }
+        .followup-tag { display: inline-block; padding: 4px 10px; border-radius: 4px; font-weight: 700; font-size: 0.85rem; margin-top: 8px; }
+        .tag-blue { background-color: #e0f2fe; color: #0369a1; }
+        .tag-slate { background-color: #f1f5f9; color: #475569; }
+
+        /* ================= 手機版專屬微調 ================= */
+        @media (max-width: 768px) {
+            th, td { padding: 12px 10px; } 
+            .text-lg { font-size: 1.05rem; } 
+            .badge { padding: 2px 6px; font-size: 0.7rem; }
+            .data-list { font-size: 0.85rem; } 
+            th:first-child, td:first-child { font-size: 0.85rem; width: 110px; } 
+            
+            /* 將按鈕改為並行顯示，不再放大佔滿全螢幕 */
+            .btn-group { flex-wrap: nowrap; gap: 8px; }
+            .action-btn { font-size: 0.85rem; padding: 8px 12px; }
+            .btn-back { flex: 0 0 auto; } /* 返回按鈕保持剛好寬度 */
+            .btn-primary { flex: 1; } /* 下載按鈕佔用剩餘空間，但不致於過大 */
+        }
+
+        /* ================= 列印專用 CSS ================= */
+        @media print {
+            .btn-group, .scroll-hint { display: none !important; }
+            body { background: white !important; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .max-w-full { max-width: 100% !important; margin: 0 !important; }
+            .table-container { box-shadow: none !important; border: none !important; margin-bottom: 0 !important; }
+            .table-scroll { overflow: visible !important; }
+            
+            table { width: 100% !important; min-width: auto !important; table-layout: fixed; }
+            th, td { padding: 10px 8px !important; font-size: 9pt !important; border: 1px solid #cbd5e1 !important; }
+            th { background-color: #f1f5f9 !important; font-size: 10pt !important; }
+            
+            .badge { border: 1px solid #94a3b8 !important; padding: 2px 4px !important; font-size: 7.5pt !important; }
+            .data-list { font-size: 8.5pt !important; }
+            .text-lg { font-size: 11pt !important; }
+            .footer-section { border: none !important; padding: 10px 0 !important; font-size: 8pt !important; }
+            
+            @page { size: landscape; margin: 10mm; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-full mx-auto">
+        
+        <div class="btn-group">
+            <a href="index.html" class="action-btn btn-back">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>返回
+            </a>
+            
+            <button onclick="window.print()" class="action-btn btn-print hidden md:inline-flex">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>列印 / PDF (電腦版)
+            </button>
+
+            <button onclick="downloadScreenshot()" id="dl-btn" class="action-btn btn-primary">
+                下載完整長截圖
+            </button>
+        </div>
+
+        <div class="mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">ER+HER2- 早期乳癌復發高風險藥物對照表</h1>
+            <p class="text-slate-500 mt-2 text-sm md:text-base">醫護專業版參考資訊</p>
+        </div>
+
+        <div class="scroll-hint md:hidden flex items-center justify-center text-sm font-bold text-sky-600 bg-sky-50 py-2 px-4 rounded-lg mb-4 animate-pulse">
+            左右滑動可查看完整對照表
+        </div>
+
+        <div class="table-container" id="capture-area">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>比較項目</th>
+                            <th>
+                                <div class="text-lg text-slate-800">捷癌寧 (Verzenio)</div>
+                                <div class="text-sm font-normal text-slate-500 mt-1">Abemaciclib</div>
+                            </th>
+                            <th>
+                                <div class="text-lg text-slate-800">擊癌利 (Kisqali)</div>
+                                <div class="text-sm font-normal text-slate-500 mt-1">Ribociclib</div>
+                            </th>
+                            <th>
+                                <div class="text-lg text-slate-800">愛斯萬 (TS-1)</div>
+                                <div class="text-sm font-normal text-slate-500 mt-1">Tegafur/Gimeracil/Oteracil</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>類別 / 機轉</td>
+                            <td><span class="badge badge-gray">標靶藥</span> 口服 CDK4/6 抑制劑</td>
+                            <td><span class="badge badge-gray">標靶藥</span> 口服 CDK4/6 抑制劑</td>
+                            <td><span class="badge badge-gray">化療藥</span> 口服 fluoropyrimidine</td>
+                        </tr>
+                        <tr>
+                            <td>臨床試驗</td>
+                            <td>
+                                <div class="highlight-text">MonarchE</div>
+                                <div class="text-sm text-slate-500">多國多中心，開放標記，RCT (N=5637)</div>
+                            </td>
+                            <td>
+                                <div class="highlight-text">NATALEE</div>
+                                <div class="text-sm text-slate-500">多國多中心，開放標記，RCT (N=5101)</div>
+                            </td>
+                            <td>
+                                <div class="highlight-text">POTENT</div>
+                                <div class="text-sm text-slate-500">日本多中心，開放標記，RCT (N=1930)</div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>試驗族群</td>
+                            <td>
+                                <div class="font-bold text-slate-700 mb-1">腋下淋巴結陽性高風險：</div>
+                                <ul class="data-list">
+                                    <li>腋下淋巴結陽性 ≥ 4 或</li>
+                                    <li>腋下淋巴結陽性為1-3，且以下任一條件：
+                                        <ul class="sub-list">
+                                            <li>腫瘤⼤⼩ ≥ 5 cm 或</li>
+                                            <li>Grade 3 或</li>
+                                            <li>Ki-67 ≥ 20%</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td>
+                                <div class="font-bold text-slate-700 mb-1">Stage II-III：</div>
+                                <ul class="data-list">
+                                    <li>Stage IIB-III 或</li>
+                                    <li>Stage IIA
+                                        <ul class="sub-list">
+                                            <li>N1</li>
+                                            <li>N0，且 Grade 3 或 "Grade 2, 且以下任一條件:"
+                                                <div class="pl-4 mt-1">Ki67 ≥ 20% 或</div>
+                                                <div class="pl-4">基因檢測高風險(Oncotype DX ≥ 26或Prosigna/PAM50, MammaPrint, EndoPredict 高風險)</div>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="data-list">
+                                    <li>腋下淋巴結轉移 (藥物治療前)</li>
+                                    <li>腋下淋巴結無轉移</li>
+                                    <li>無術前藥物治療史，以下任一條件：
+                                        <ul class="sub-list">
+                                            <li>侵犯直徑 ≥ 3 cm</li>
+                                            <li>Grade 3</li>
+                                            <li>LVI</li>
+                                            <li>Grade 2，侵犯直徑 ≥ 2 cm且<3 cm</li>
+                                            <li>Grade 2，侵犯直徑< 2 cm，且⾼增殖標記</li>
+                                            <li>Grade 1，侵犯直徑 ≥ 2 cm且< 3 cm且⾼增殖標記</li>
+                                        </ul>
+                                    </li>
+                                    <li>術前化療史：具殘留的侵襲性癌症</li>
+                                    <li>⾼增殖標記：Ki-67 ≥ 30% or Ki-67 14-29%+RS ≥18</li>
+                                </ul>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>台灣適應症 /<br>健保給付</td>
+                            <td>
+                                <span class="badge badge-green">適應症：O</span>
+                                <span class="badge badge-green">健保給付：O</span>
+                            </td>
+                            <td>
+                                <span class="badge badge-red">適應症：X</span>
+                                <span class="badge badge-red">健保給付：X</span>
+                            </td>
+                            <td>
+                                <span class="badge badge-green">適應症：O</span>
+                                <span class="badge badge-red">健保給付：X</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>國際治療指引<br><span class="text-xs font-normal text-slate-500">(NCCN/ASCO/ESMO)</span></td>
+                            <td>
+                                <span class="badge badge-green">Ο (Category 1 / Strong / A)</span>
+                            </td>
+                            <td>
+                                <span class="badge badge-yellow">Δ (Category 1 / Conditional / A)</span>
+                            </td>
+                            <td>
+                                <span class="badge badge-red">X (未列入核心推薦)</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>OS<br><span class="text-xs font-normal text-slate-500">(整體存活期)</span></td>
+                            <td>
+                                <span class="badge badge-green">✅ 統計學顯著獲益</span><br>
+                                <div class="highlight-text text-lg mt-1">HR: 0.842 <span class="text-base font-normal">(0.722-0.981)</span></div>
+                                <div class="text-sm text-slate-500 mt-1">P = 0.0273 (2 sided)</div>
+                            </td>
+                            <td>
+                                <span class="badge badge-yellow">⚠️ 未成熟，且無法檢定獲益</span><br>
+                                <div class="highlight-text text-lg mt-1">HR: 0.800 <span class="text-base font-normal">(0.637-1.003)</span></div>
+                                <div class="text-sm text-slate-500 mt-1">P = 0.026 (1 sided, informational)</div>
+                            </td>
+                            <td>
+                                <span class="badge badge-red">❌ 未達統計學顯著獲益</span><br>
+                                <div class="highlight-text text-lg mt-1">HR: 0.90 <span class="text-base font-normal">(0.56-1.44)</span></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>iDFS</td>
+                            <td>
+                                <div class="highlight-text text-lg">HR: 0.734 <span class="text-base font-normal">(0.657-0.820)</span></div>
+                                <div class="text-sm text-slate-500 mb-2">P < 0.0001</div>
+                                <span class="badge badge-purple">🎯 7年絕對獲益達 7.6%</span>
+                            </td>
+                            <td>
+                                <div class="highlight-text text-lg">HR: 0.716 <span class="text-base font-normal">(0.618-0.829)</span></div>
+                                <div class="text-sm text-slate-500 mb-2">P < 0.0001</div>
+                                <span class="badge badge-gray">🎯 5年絕對獲益約 3.2%</span>
+                            </td>
+                            <td>
+                                <div class="highlight-text text-lg">HR: 0.63 <span class="text-base font-normal">(0.49-0.81)</span></div>
+                                <div class="text-sm text-slate-500 mb-2">P = 0.0003</div>
+                                <span class="badge badge-gray">🎯 5年絕對獲益約 5.3%</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>DRFS</td>
+                            <td>
+                                <div class="highlight-text text-lg">HR: 0.746 <span class="text-base font-normal">(0.662-0.840)</span></div>
+                                <div class="text-sm text-slate-500 mb-2">P < 0.0001</div>
+                                <span class="badge badge-purple">🎯 7年絕對獲益達 6.7%</span>
+                            </td>
+                            <td>
+                                <div class="highlight-text text-lg">HR: 0.699 <span class="text-base font-normal">(0.594-0.824)</span></div>
+                                <div class="text-sm text-slate-500 mb-2">P < 0.0001</div>
+                            </td>
+                            <td class="font-bold text-slate-400">X</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>追蹤時長 / 療程</td>
+                            <td>
+                                <div class="mb-1"><span class="highlight-text">追蹤：</span>7 年</div>
+                                <div><span class="highlight-text">療程：</span>使用 2 年</div>
+                                <div class="followup-tag tag-blue">📌 停藥 5 年後療效</div>
+                            </td>
+                            <td>
+                                <div class="mb-1"><span class="highlight-text">追蹤：</span>5 年</div>
+                                <div><span class="highlight-text">療程：</span>使用 3 年</div>
+                                <div class="followup-tag tag-slate">📌 停藥 2 年後療效</div>
+                            </td>
+                            <td>
+                                <div class="mb-1"><span class="highlight-text">追蹤：</span>5 年</div>
+                                <div><span class="highlight-text">療程：</span>使用 1 年</div>
+                                <div class="followup-tag tag-slate">📌 停藥 4 年後療效</div>
+                            </td>
+                        </tr>
+
+                        <tr class="section-header">
+                            <td colspan="4">副作用發生率 (依系統分類)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-slate-700">血液毒性</td>
+                            <td>
+                                <ul class="data-list text-sm">
+                                    <li><span class="font-semibold">白血球減少 89%</span> (G3:19%)</li>
+                                    <li><span class="font-semibold">嗜中性球減少 84%</span> (G3:18%)</li>
+                                    <li>淋巴球減少 59% (G3:13%)</li>
+                                    <li>貧血 68% (G3:1%)</li>
+                                    <li>血小板減少 37%</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="data-list text-sm">
+                                    <li><span class="font-semibold text-rose-700">白血球減少 95%</span> (G3/4:27%)</li>
+                                    <li><span class="font-semibold text-rose-700">嗜中性球減少 94%</span> (G3/4:45%)</li>
+                                    <li>淋巴球減少 97% (G3/4:19%)</li>
+                                    <li>貧血 47% (G3:0.6%)</li>
+                                    <li>血小板減少 28%</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="data-list text-sm">
+                                    <li>白血球減少 53% (G3:2%)</li>
+                                    <li>嗜中性球減少 34% (G3:7%)</li>
+                                    <li>淋巴球減少 (未報告)</li>
+                                    <li>貧血 35% (G3:<1%)</li>
+                                    <li>血小板減少 32%</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-slate-700">腸胃道症狀</td>
+                            <td>
+                                <ul class="data-list text-sm">
+                                    <li><span class="font-semibold text-rose-700">腹瀉 84%</span> (G3:8%)</li>
+                                    <li>噁心 30%、嘔吐 18%</li>
+                                    <li>口腔炎 14%</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="data-list text-sm">
+                                    <li>腹瀉 15%</li>
+                                    <li>噁心 23%、嘔吐 8%</li>
+                                    <li>口腔炎 6%</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="data-list text-sm">
+                                    <li>腹瀉 30% (G3:2%)</li>
+                                    <li>噁心 34%、嘔吐 (未報告)</li>
+                                    <li>口腔炎 27%</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-slate-700">肝功能、腎臟<br>與全身性症狀</td>
+                            <td>
+                                <ul class="data-list text-sm">
+                                    <li>ALT上升 37% (G3:2.5%)</li>
+                                    <li>AST上升 31% (G3:1.5%)</li>
+                                    <li>肌酸酐上升 99%</li>
+                                    <li>感染 51% (G3:5%)、疲倦 41%</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="data-list text-sm">
+                                    <li><span class="font-semibold text-rose-700">ALT上升 45%</span> (G3/4:8%)</li>
+                                    <li><span class="font-semibold text-rose-700">AST上升 44%</span> (G3/4:5%)</li>
+                                    <li>肌酸酐上升 33%</li>
+                                    <li>感染 37% (G3:2%)、疲倦 22%</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="data-list text-sm">
+                                    <li>ALT上升 42% (G3:<1%)</li>
+                                    <li>AST上升 38% (G3:<1%)</li>
+                                    <li>膽紅素上升 40% (G3:1%)</li>
+                                    <li>肌酸酐上升 14%</li>
+                                    <li>厭食 28%、疲倦 38%</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold text-slate-700">其他特殊</td>
+                            <td>
+                                <ul class="data-list text-sm">
+                                    <li>ILD 3% (G3/4:0.4%)</li>
+                                    <li>VTE 3%</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="data-list text-sm">
+                                    <li>ILD 1.5%</li>
+                                    <li>肺栓塞 0.6%</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="data-list text-sm">
+                                    <li><span class="font-semibold text-rose-700">皮膚色素沉著 50%</span></li>
+                                    <li>⼿⾜症候群 21.8%</li>
+                                </ul>
+                            </td>
+                        </tr>
+
+                        <tr class="section-header">
+                            <td colspan="4">副作用管理與處置</td>
+                        </tr>
+                        <tr>
+                            <td>因副作用<br>永久停藥比例</td>
+                            <td>
+                                <div class="text-lg highlight-text">19%</div>
+                                <div class="text-sm text-slate-500">（腹瀉5%）</div>
+                            </td>
+                            <td>
+                                <div class="text-lg highlight-text">20%</div>
+                                <div class="text-sm text-slate-500">（ALT/AST升高8%）</div>
+                            </td>
+                            <td>
+                                <div class="text-lg highlight-text">14%</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>因副作用<br>暫停用藥比例</td>
+                            <td>
+                                <div class="text-lg highlight-text">62%</div>
+                                <div class="text-sm text-slate-500">（腹瀉20%、嗜中性球低下16%）</div>
+                            </td>
+                            <td>
+                                <div class="text-lg highlight-text">73%</div>
+                                <div class="text-sm text-slate-500">（嗜中性球低下43%、肝功能異常11%）</div>
+                            </td>
+                            <td class="font-bold text-slate-400">-</td>
+                        </tr>
+                        <tr>
+                            <td>因副作用<br>降劑量比例</td>
+                            <td>
+                                <div class="text-lg highlight-text">44%</div>
+                                <div class="text-sm text-slate-500">（腹瀉17%、嗜中性球低下8%）</div>
+                            </td>
+                            <td>
+                                <div class="text-lg highlight-text">23%</div>
+                                <div class="text-sm text-slate-500">（嗜中性球低下14%、肝功能異常2.3%）</div>
+                            </td>
+                            <td>
+                                <div class="text-lg highlight-text">31%</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>降劑量選項</td>
+                            <td class="font-semibold">100mg, 50mg</td>
+                            <td class="font-semibold">200mg</td>
+                            <td class="font-semibold">40mg, 50mg, 60mg / 次</td>
+                        </tr>
+
+                        <tr>
+                            <td>藥物交互作用</td>
+                            <td>
+                                <ul class="data-list">
+                                    <li>避免強效或中效CYP3A抑制劑</li>
+                                    <li>避免強效或中效CYP3A誘導劑</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="data-list">
+                                    <li>避免強效CYP3A抑制劑、強效CYP3A誘導劑</li>
+                                    <li><span class="alert-text">延長QT藥物</span> (抗心律不整藥、部分抗生素)</li>
+                                    <li>治療指數狹窄之敏感性CYP3A受質<span class="font-bold">可能需要降低劑量</span></li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="data-list">
+                                    <li><span class="alert-text">禁用：</span>Flucytosine、其他fluoropyrimidine類抗癌藥、其他fluorouracil類藥物、Brivudine及其類似物</li>
+                                    <li><span class="font-bold">謹慎給藥：</span>Phenytoin、Warfarin、其他抗惡性腫瘤劑或放射線治療等</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>肝功能不全</td>
+                            <td>
+                                <ul class="data-list">
+                                    <li>Child-Pugh A或B的病⼈不需調整劑量。</li>
+                                    <li>Child Pugh-C，改為QD。</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="data-list">
+                                    <li>400mg 不需調整劑量。</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="data-list">
+                                    <li>因藥動學尚未評估，<span class="alert-text">不建議使⽤</span>。</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>腎功能不全</td>
+                            <td>
+                                <ul class="data-list">
+                                    <li>輕中度病⼈不需調整劑量。</li>
+                                    <li>尚無重度、末期腎臟疾病或接受透析病⼈的資料。</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="data-list">
+                                    <li>輕中度病⼈不需調整劑量。</li>
+                                    <li>重度改為 200mg 起始。</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="data-list">
+                                    <li>因藥動學尚未評估，<span class="alert-text">不建議使⽤</span>。</li>
+                                    <li>Ccr為50-80 mL/min，依照仿單對照體表面積使用。</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>監測建議</td>
+                            <td>
+                                <div class="text-sm text-slate-600">
+                                    <strong>CBC/LFT：</strong>治療前、前2月每2週、之後每月。<br>
+                                    監測發燒（嗜中性球低下）、呼吸道症狀（ILD）、VTE症狀。
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-sm text-slate-600">
+                                    <strong>CBC/LFT：</strong>治療前、前2月每2週、之後4週期開始時。<br>
+                                    <strong>ECG/電解質：</strong>治療前+第1週期D14+臨床需要時 / 前6週期每週期開始。<br>
+                                    監測<span class="alert-text">QT延長症狀</span>（心悸/暈厥）、皮膚反應、呼吸道症狀。
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-sm text-slate-600">
+                                    <strong>CBC/LFT：</strong>各療程開始前+給藥期間至少每2週。<br>
+                                    特別監測<span class="alert-text">肝功能異常徵兆</span>（倦怠/食慾不振/黃疸出現立即停藥）；開始前評估Ccr腎功能。
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>療程總價格<br><span class="text-xs font-normal text-slate-500">(自費預估)</span></td>
+                            <td class="text-xl font-bold text-slate-800">約 168 萬</td>
+                            <td class="text-xl font-bold text-slate-800">約 70 萬</td>
+                            <td class="text-xl font-bold text-slate-800">約 20 萬</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <p class="font-bold text-slate-700 mb-2">【重要聲明】</p>
+            <p class="mb-5">本表格為跨試驗間接比較，各試驗在患者族群、試驗設計及評估方式上存在差異，數值不應直接比較。目前尚無 head-to-head 隨機對照試驗直接比較三種藥物。</p>
+            
+            <p class="font-bold text-slate-700 mb-2">【參考文獻】</p>
+            <ol class="list-decimal pl-5 space-y-2">
+                <li>Johnston SRD, et al. Overall survival with abemaciclib in early breast cancer. <em>Ann Oncol</em>. 2026;37(2):155-165.</li>
+                <li>Crown J, et al. Adjuvant ribociclib plus nonsteroidal aromatase inhibitor therapy in patients with HR-positive/HER2-negative early breast cancer: 5-year follow-up of NATALEE efficacy outcomes and updated overall survival. <em>ESMO Open</em>. 2025;10(11):105858.</li>
+                <li>Toi M, et al. Adjuvant S-1 plus endocrine therapy for oestrogen receptor-positive, HER2-negative, primary breast cancer: a multicentre, open-label, randomised, controlled, phase 3 trial. <em>Lancet Oncol</em>. 2021;22(1):74-84.</li>
+                <li>Verzenio ® (abemaciclib) Package Insert. Taiwan TFDA; 2025-04-11 (edition).</li>
+                <li>Kisqali® (ribociclib) Package Insert. US FDA; 2025-09-16 (edition).</li>
+                <li>TS-1® (Tegafur and Gimeracil and Oteracil) Package Insert. Taiwan TFDA; 2024-08-29 (edition).</li>
+            </ol>
+        </div>
+
+    </div>
+
+    <script>
+        function downloadScreenshot() {
+            const btn = document.getElementById('dl-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ 截圖產生中...';
+            btn.disabled = true;
+
+            const stickies = document.querySelectorAll('th, td');
+            stickies.forEach(el => {
+                if(window.getComputedStyle(el).position === 'sticky') {
+                    el.setAttribute('data-sticky', 'true');
+                    el.style.position = 'static';
+                }
+            });
+
+            const captureElement = document.getElementById('capture-area');
+            
+            html2canvas(captureElement, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'ER_HER2_早期乳癌自費對照表_專業版.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                stickies.forEach(el => {
+                    if(el.getAttribute('data-sticky') === 'true') {
+                        el.style.position = '';
+                        el.removeAttribute('data-sticky');
+                    }
+                });
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }).catch(err => {
+                console.error('截圖失敗:', err);
+                alert('截圖產生失敗，建議直接使用手機內建截圖功能。');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>

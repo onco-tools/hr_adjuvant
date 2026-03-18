@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Abemaciclib (Verzenio) 早期乳癌評估與 AE 管理工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body { background-color: #f8fafc; font-family: 'Inter', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+        .card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03); padding: 24px; margin-bottom: 20px; border: 1px solid #f1f5f9; }
+        .section-header { display: flex; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #f1f5f9; }
+        .section-title { font-size: 1.125rem; font-weight: 700; color: #1e293b; }
+        .check-row { display: flex; align-items: flex-start; padding: 14px 16px; background: #f8fafc; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; -webkit-tap-highlight-color: transparent; }
+        .check-row:has(input:checked) { background: #eff6ff; border-color: #bfdbfe; }
+        .check-row input[type="checkbox"] { margin-top: 3px; margin-right: 14px; width: 20px; height: 20px; flex-shrink: 0; accent-color: #2563eb; cursor: pointer; }
+        .check-text { font-size: 1rem; color: #334155; line-height: 1.5; font-weight: 500; pointer-events: none; }
+        .check-subtext { display: block; font-size: 0.85rem; color: #64748b; margin-top: 4px; font-weight: 400; }
+        .sub-group { margin-left: 12px; padding-left: 16px; border-left: 2px solid #e2e8f0; margin-bottom: 16px; }
+
+        /* 副作用速查視窗 */
+        #aeModal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: white; border-radius: 24px; width: 100%; max-width: 32rem; max-height: 85vh; overflow-y: auto; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        .modal-content::-webkit-scrollbar { width: 6px; }
+        .modal-content::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+
+        .result-floating { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 28rem; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); z-index: 50; overflow: hidden; transition: 0.3s; }
+        @supports (backdrop-filter: blur(12px)) { .result-floating.bg-gray-500 { background: rgba(100, 116, 139, 0.95); backdrop-filter: blur(12px); } .result-floating.bg-emerald-500 { background: rgba(16, 185, 129, 0.95); backdrop-filter: blur(12px); } .result-floating.bg-amber-500 { background: rgba(245, 158, 11, 0.95); backdrop-filter: blur(12px); } }
+        .result-inner { padding: 20px 24px; text-align: center; }
+        .action-btn { margin-top: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; padding: 12px; border-radius: 9999px; width: 100%; cursor: pointer; border: none; transition: 0.1s; text-decoration: none; }
+        .btn-dark { background-color: #1e293b; color: white; }
+        .btn-orange { background-color: white; color: #d97706; }
+        .hidden { display: none !important; }
+        #toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 12px 24px; border-radius: 9999px; font-weight: 600; opacity: 0; transition: 0.3s; z-index: 1000; pointer-events: none; }
+
+        /* 圖像化 UI 專用 */
+        .info-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        .step-arrow { color: #cbd5e1; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body class="pb-80 pt-6">
+    <div id="toast">✅ 已複製摘要</div>
+
+    <div id="aeModal">
+        <div class="modal-content p-5 md:p-6">
+            <div class="flex justify-between items-center mb-5 sticky top-0 bg-white z-10 pb-2 border-b border-slate-100">
+                <h2 class="text-xl font-bold text-slate-800">AE 管理與衛教指引</h2>
+                <button onclick="toggleAE(false)" class="text-slate-400 hover:text-slate-600 text-3xl leading-none">&times;</button>
+            </div>
+            
+            <div class="space-y-6">
+                
+                <div>
+                    <h3 class="font-bold text-slate-700 text-sm mb-2">🗣️ 預期管理與飲食衛教</h3>
+                    <div class="bg-sky-50 border border-sky-100 rounded-xl p-4">
+                        <div class="mb-4">
+                            <span class="font-bold text-sky-900 block mb-2">【預期管理】打預防針，降低恐慌</span>
+                            <ul class="list-disc pl-5 text-slate-700 text-sm space-y-1.5 leading-relaxed">
+                                <li>腹瀉大多發生在<span class="font-bold text-sky-800">治療第一個月內（中位數約第8天）</span>。</li>
+                                <li>這代表藥物正在發揮作用，只要在第一次發生時適當處置，<span class="font-bold text-sky-800">後續的發生率與嚴重度就會大幅下降</span>。</li>
+                            </ul>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-center shadow-sm">
+                                <div class="text-emerald-700 font-bold mb-1 text-sm">✅ 建議飲食 (BRAT)</div>
+                                <div class="text-xl mb-1 tracking-widest">🍌🍚🍎🍞</div>
+                                <div class="text-xs text-emerald-600 font-medium">香蕉/白飯/蘋果泥/吐司</div>
+                            </div>
+                            <div class="bg-rose-50 border border-rose-100 rounded-xl p-3 text-center shadow-sm">
+                                <div class="text-rose-700 font-bold mb-1 text-sm">❌ 務必避免</div>
+                                <div class="text-xl mb-1 tracking-widest">🌶️🥦🍟☕</div>
+                                <div class="text-xs text-rose-600 font-medium leading-relaxed">辛辣 / <span class="font-bold border-b border-rose-300">高纖</span> / <span class="font-bold border-b border-rose-300">油膩</span> / 咖啡因</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-700 text-sm mb-2">💊 止瀉藥 (Loperamide) 給藥流程</h3>
+                    <div class="flex items-stretch justify-between bg-slate-50 border border-slate-200 rounded-xl p-3 shadow-sm">
+                        <div class="text-center flex-1">
+                            <div class="text-xs text-slate-500 mb-1">首次發生</div>
+                            <div class="font-bold text-slate-800 text-lg">2 顆</div>
+                        </div>
+                        <div class="step-arrow px-1">➔</div>
+                        <div class="text-center flex-1">
+                            <div class="text-xs text-slate-500 mb-1">後續 (每2hr)</div>
+                            <div class="font-bold text-slate-800 text-lg">1 顆</div>
+                        </div>
+                        <div class="step-arrow px-1">➔</div>
+                        <div class="text-center flex-1">
+                            <div class="text-xs text-slate-500 mb-1">每日上限</div>
+                            <div class="font-bold text-rose-600 text-lg">8 顆</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-700 text-sm mb-2">📉 腹瀉分級與降劑量決策</h3>
+                    
+                    <div class="info-card flex items-center justify-between py-3 shadow-sm">
+                        <div>
+                            <span class="inline-block bg-slate-200 text-slate-700 text-xs font-bold px-2 py-1 rounded mb-1">Grade 1</span>
+                            <div class="text-sm font-semibold text-slate-800">每日增加 < 4 次</div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-emerald-600 font-bold text-sm">✅ 維持原劑量</span>
+                        </div>
+                    </div>
+
+                    <div class="info-card flex items-center justify-between py-3 shadow-sm">
+                        <div>
+                            <span class="inline-block bg-amber-100 text-amber-700 text-xs font-bold px-2 py-1 rounded mb-1">Grade 2</span>
+                            <div class="text-sm font-semibold text-slate-800">增加 4-6 次 (24hr未緩解)</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-rose-600 font-bold text-sm mb-1">⏸️ 先暫停用藥</div>
+                            <div class="text-emerald-600 font-bold text-sm">✅ 恢復原劑量</div>
+                        </div>
+                    </div>
+
+                    <div class="info-card flex items-center justify-between py-3 mb-0 shadow-sm">
+                        <div>
+                            <span class="inline-block bg-rose-100 text-rose-700 text-xs font-bold px-2 py-1 rounded mb-1">Grade 3/4</span>
+                            <div class="text-sm font-semibold text-slate-800">增加 ≥ 7 次 或 反覆發作</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-rose-600 font-bold text-sm mb-1">⏸️ 先暫停用藥</div>
+                            <div class="text-rose-600 font-bold text-sm">⬇️ 降一階劑量</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-100 pt-5 mt-2">
+                    <h3 class="font-bold text-slate-700 text-sm mb-3">📊 降劑量不影響長期療效</h3>
+                    
+                    <div class="text-center mb-3">
+                        <img src="dose_reduction.png" alt="降劑量不影響療效數據圖" class="w-full rounded-lg shadow-sm border border-slate-200 mx-auto" onerror="this.src='https://via.placeholder.com/600x300/f8fafc/94a3b8?text=請放入圖檔+dose_reduction.png'">
+                    </div>
+                    
+                    <div class="bg-slate-50 p-3 rounded-lg text-center border border-slate-100 shadow-sm">
+                        <div class="text-sm text-slate-700 font-medium">主動降劑量與原劑量相比，<span class="text-rose-600 font-bold">療效無顯著差異</span></div>
+                        <div class="mt-1 font-bold text-slate-800 text-lg">
+                            HR: 0.905 <span class="text-xs font-normal text-slate-500">(95% CI: 0.727-1.127)</span>
+                        </div>
+                    </div>
+
+                    <p class="text-[10px] text-slate-400 mt-3 text-right">
+                        Ref: Goetz MP, et al. <i>npj Breast Cancer</i>. 2024;10:34.
+                    </p>
+                </div>
+
+            </div>
+            
+            <button onclick="toggleAE(false)" class="action-btn btn-dark mt-6">關閉指引</button>
+        </div>
+    </div>
+
+    <div class="max-w-md mx-auto p-4">
+        <div class="flex justify-between items-center mb-6 px-1">
+            <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Verzenio 評估工具</h1>
+            <div class="flex gap-2">
+                <button onclick="toggleAE(true)" class="bg-blue-50 text-blue-600 border border-blue-100 text-xs font-bold py-2 px-3 rounded-full shadow-sm flex items-center">💡 AE 衛教指引</button>
+                <button onclick="resetForm()" class="bg-white text-slate-500 border border-slate-200 text-xs font-bold py-2 px-3 rounded-full shadow-sm flex items-center">重置</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-header"><div class="w-2 h-6 bg-blue-600 rounded-full mr-3"></div><h2 class="section-title mb-0">基本病理與歷程</h2></div>
+            <label class="check-row"><input type="checkbox" id="erpr_gt30" onchange="runCalc()"> <span class="check-text">ER/PR > 30%</span></label>
+            <label class="check-row"><input type="checkbox" id="her2_neg" onchange="runCalc()"> <span class="check-text">HER2 陰性</span></label>
+            <label class="check-row">
+                <input type="checkbox" id="chemo_used" onchange="runCalc()"> 
+                <span class="check-text">使用標準化療 <span class="check-subtext">特殊情況未使用可事審允許</span></span>
+            </label>
+            <label class="check-row">
+                <input type="checkbox" id="radio_used" onchange="runCalc()"> 
+                <span class="check-text">使用放療 <span class="check-subtext">特殊情況未使用可事審允許</span></span>
+            </label>
+            <label class="check-row"><input type="checkbox" id="endo_12w" onchange="runCalc()"> <span class="check-text">內分泌治療 &le; 12 周</span></label>
+            <label class="check-row"><input type="checkbox" id="surg_16m" onchange="runCalc()"> <span class="check-text">手術後 &le; 16 個月</span></label>
+        </div>
+
+        <div class="card">
+            <div class="section-header"><div class="w-2 h-6 bg-blue-600 rounded-full mr-3"></div><h2 class="section-title mb-0">High-Risk Criteria</h2></div>
+            
+            <h3 class="font-bold text-slate-700 mb-2 px-1 text-sm">▶ Neoadjuvant chemo</h3>
+            <label class="check-row">
+                <input type="checkbox" id="neo_n1_3" onchange="runCalc()"> 
+                <span class="check-text">化療前 ALN 1-3 顆 <span class="check-subtext">含N1mi，不含鎖骨上或內乳淋巴結</span></span>
+            </label>
+            <div class="sub-group">
+                <label class="check-row"><input type="checkbox" id="neo_g3" onchange="runCalc()"> <span class="check-text text-sm">化療前 Tumor病理(CNB/FNA) Grade 3</span></label>
+                <label class="check-row"><input type="checkbox" id="neo_t5_uni" onchange="runCalc()"> <span class="check-text text-sm">化療前 Tumor影像 &ge; 5cm (Unifocal)</span></label>
+                <label class="check-row"><input type="checkbox" id="neo_t5_multi" onchange="runCalc()"> <span class="check-text text-sm">化療前 Tumor影像 &ge; 5cm (Multi加總)</span></label>
+            </div>
+            <label class="check-row"><input type="checkbox" id="neo_ki67" onchange="runCalc()"> <span class="check-text">化療前 Ki-67 &ge; 20% <span class="check-subtext text-amber-600 font-bold">自費條件</span></span></label>
+
+            <div class="border-t border-slate-100 pt-4 mt-2">
+                <h3 class="font-bold text-slate-700 mb-2 px-1 text-sm">▶ Adjuvant chemo</h3>
+                <label class="check-row"><input type="checkbox" id="adj_n4" onchange="runCalc()"> <span class="check-text">手術病理 ALN &ge; 4 顆</span></label>
+                <label class="check-row">
+                    <input type="checkbox" id="adj_n1_3" onchange="runCalc()"> 
+                    <span class="check-text">手術病理 ALN 1-3 顆 <span class="check-subtext">含N1mi，不含鎖骨上或內乳淋巴結</span></span>
+                </label>
+                <div class="sub-group">
+                    <label class="check-row"><input type="checkbox" id="adj_g3" onchange="runCalc()"> <span class="check-text text-sm">手術病理 Grade 3</span></label>
+                    <label class="check-row"><input type="checkbox" id="adj_t5_uni" onchange="runCalc()"> <span class="check-text text-sm">手術病理 Tumor &ge; 5cm (Unifocal)</span></label>
+                    <label class="check-row"><input type="checkbox" id="adj_t5_multi" onchange="runCalc()"> <span class="check-text text-sm">手術病理 Tumor &ge; 5cm (Multi加總)</span></label>
+                </div>
+                <label class="check-row"><input type="checkbox" id="adj_ki67" onchange="runCalc()"> <span class="check-text">手術病理 Ki-67 &ge; 20% <span class="check-subtext text-amber-600 font-bold">自費條件</span></span></label>
+            </div>
+        </div>
+
+        <div class="card mb-6">
+            <div class="section-header"><div class="w-2 h-6 bg-slate-400 rounded-full mr-3"></div><h2 class="section-title mb-0">Exclusion (Self-pay only)</h2></div>
+            <label class="check-row"><input type="checkbox" id="exc_male" onchange="runCalc()"> <span class="check-text">男性患者</span></label>
+            <label class="check-row"><input type="checkbox" id="exc_erpr_low" onchange="runCalc()"> <span class="check-text">ER/PR &le; 30%</span></label>
+        </div>
+
+        <div class="text-center text-xs text-slate-400 mt-6 mb-12">
+            最後更新日期：2026年3月16日
+        </div>
+    </div>
+
+    <div id="resultBanner" class="result-floating bg-gray-500">
+        <div class="result-inner">
+            <div id="mainStatus" class="main-status text-white font-bold text-lg mb-1">請勾選條件評估</div>
+            
+            <div id="reasonList" class="hidden"></div>
+            
+            <button id="copyBtn" onclick="generateEMR()" class="hidden action-btn btn-dark">📋 複製健保申請輔助摘要</button>
+            <a id="compareBtn" href="comparison.html" class="hidden action-btn btn-orange">📊 醫護專業版自費對照表</a>
+        </div>
+    </div>
+
+    <script>
+        let currentStatus = "none";
+        function toggleAE(show) { document.getElementById('aeModal').style.display = show ? 'flex' : 'none'; }
+        
+        function runCalc() {
+            let base = ['erpr_gt30', 'her2_neg', 'chemo_used', 'radio_used', 'endo_12w', 'surg_16m'].every(id => document.getElementById(id).checked);
+            
+            let neoRisk = document.getElementById('neo_n1_3').checked && (document.getElementById('neo_g3').checked || document.getElementById('neo_t5_uni').checked || document.getElementById('neo_t5_multi').checked);
+            let adjRisk = document.getElementById('adj_n4').checked || (document.getElementById('adj_n1_3').checked && (document.getElementById('adj_g3').checked || document.getElementById('adj_t5_uni').checked || document.getElementById('adj_t5_multi').checked));
+            
+            let risk = neoRisk || adjRisk;
+            let isKi67 = document.getElementById('neo_ki67').checked || document.getElementById('adj_ki67').checked;
+
+            let isNHI = base && risk && !document.getElementById('exc_male').checked && !document.getElementById('exc_erpr_low').checked;
+            let isSelf = (!isNHI && (risk || isKi67)) || (risk && (document.getElementById('exc_male').checked || document.getElementById('exc_erpr_low').checked));
+
+            let banner = document.getElementById('resultBanner');
+            let mainStatus = document.getElementById('mainStatus');
+            let reasonList = document.getElementById('reasonList');
+            let copyBtn = document.getElementById('copyBtn');
+            let compareBtn = document.getElementById('compareBtn');
+            banner.className = 'result-floating';
+
+            if(isNHI) {
+                currentStatus = "nhi"; 
+                mainStatus.innerHTML = "✅ 符合健保給付"; 
+                banner.classList.add('bg-emerald-500'); 
+                reasonList.className = "hidden";
+                copyBtn.innerHTML = "📋 複製健保申請輔助摘要";
+                copyBtn.className = "action-btn btn-dark";
+                compareBtn.className = "hidden";
+            } else if(isSelf) {
+                currentStatus = "self"; 
+                mainStatus.innerHTML = "💡 建議自費使用"; 
+                banner.classList.add('bg-amber-500'); 
+                
+                let missingNHI = [];
+                if (!document.getElementById('erpr_gt30').checked && !document.getElementById('exc_erpr_low').checked) missingNHI.push("未勾選【ER/PR > 30%】");
+                if (!document.getElementById('her2_neg').checked) missingNHI.push("未勾選【HER2 陰性】");
+                if (!document.getElementById('chemo_used').checked) missingNHI.push("未勾選【完成標準化療】");
+                if (!document.getElementById('radio_used').checked) missingNHI.push("未勾選【完成放療】");
+                if (!document.getElementById('endo_12w').checked) missingNHI.push("未勾選【內分泌治療 ≤ 12 周】");
+                if (!document.getElementById('surg_16m').checked) missingNHI.push("未勾選【手術後 ≤ 16 個月】");
+                
+                if (!risk) missingNHI.push("未達標【健保高風險條件】(需淋巴結≥4顆，或1-3顆且併有Grade 3或腫瘤≥5cm)");
+                
+                if (document.getElementById('exc_male').checked) missingNHI.push("排除條件【男性患者】健保不給付");
+                if (document.getElementById('exc_erpr_low').checked) missingNHI.push("排除條件【ER/PR ≤ 30%】健保不給付");
+
+                reasonList.innerHTML = `
+                    <div class="text-sm text-amber-50 bg-amber-600/40 p-3 rounded-lg mt-3 mb-3 text-left border border-amber-500/50">
+                        <span class="font-bold block mb-1">⚠️ 無法申請健保原因：</span>
+                        <ul class="list-disc pl-5 opacity-90 text-xs space-y-1">
+                            ${missingNHI.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>`;
+                reasonList.className = "block";
+
+                copyBtn.innerHTML = "📋 複製輔助摘要";
+                copyBtn.className = "action-btn btn-dark";
+                compareBtn.className = "action-btn btn-orange";
+            } else {
+                currentStatus = "none"; 
+                mainStatus.innerHTML = "請繼續勾選評估條件"; 
+                banner.classList.add('bg-gray-500'); 
+                reasonList.className = "hidden";
+                copyBtn.className = "hidden";
+                compareBtn.className = "hidden";
+            }
+        }
+
+        function generateEMR() {
+            let emrText = "Patient: [Gender], [Age] y/o　　Diagnosis: [L/R] HR+/HER2− Breast Cancer　Stage: [Stage]　　Application: First-time\n\n";
+            emrText += "All criteria confirmed as follows:\n\n";
+
+            let counter = 1;
+
+            if (document.getElementById('erpr_gt30').checked) {
+                emrText += `(${counter++}) HR Positive\nER/PR >____% — exceeds the required >30% threshold.\n\n`;
+            }
+            if (document.getElementById('her2_neg').checked) {
+                emrText += `(${counter++}) HER2 Negative\nHER-2: ____ (negative) confirmed on pathology.\n\n`;
+            }
+            if (document.getElementById('chemo_used').checked) {
+                emrText += `(${counter++}) Chemotherapy Administered\nCompleted full course of ________________________.\n\n`;
+            }
+
+            if (document.getElementById('adj_n4').checked) {
+                emrText += `(${counter++}) Pathological Lymph Node Positive: ≥4 Nodes\nSurgery pathology (ALND) confirmed ≥4 positive nodes.\n\n`;
+            } else if (document.getElementById('adj_n1_3').checked) {
+                emrText += `(${counter++}) Pathological Lymph Node Positive: 1–3 Nodes\nSurgery pathology confirmed 1–3 positive nodes.\n\n`;
+            } else if (document.getElementById('neo_n1_3').checked) {
+                emrText += `(${counter++}) Pre-Chemotherapy Pathological Lymph Node Positive: 1–3 Nodes\nCNB/FNA confirmed pathological lymph node positivity, 1–3 nodes.\n\n`;
+            }
+
+            let highRiskStatements = [];
+            
+            if (document.getElementById('neo_g3').checked) highRiskStatements.push("Pre-chemotherapy pathology (CNB/FNA) confirmed Grade 3");
+            if (document.getElementById('neo_t5_uni').checked) highRiskStatements.push("Pre-chemotherapy imaging confirmed Tumor ≥5cm (Unifocal)");
+            if (document.getElementById('neo_t5_multi').checked) highRiskStatements.push("Pre-chemotherapy imaging confirmed Tumor ≥5cm (Multifocal/Multicentric)");
+            if (document.getElementById('neo_ki67').checked) highRiskStatements.push("Pre-chemotherapy pathology confirmed Ki-67 ≥20%");
+            
+            if (document.getElementById('adj_g3').checked) highRiskStatements.push("Surgery pathology confirmed Grade 3");
+            if (document.getElementById('adj_t5_uni').checked) highRiskStatements.push("Surgery pathology confirmed Tumor ≥5cm (Unifocal)");
+            if (document.getElementById('adj_t5_multi').checked) highRiskStatements.push("Surgery pathology confirmed Tumor ≥5cm (Multifocal/Multicentric)");
+            if (document.getElementById('adj_ki67').checked) highRiskStatements.push("Surgery pathology confirmed Ki-67 ≥20%");
+
+            if (highRiskStatements.length > 0) {
+                emrText += `(${counter++}) High-Risk Tumor Characteristics\n- ${highRiskStatements.join('\n- ')}\n— high-risk criterion satisfied.\n\n`;
+            }
+
+            if (document.getElementById('radio_used').checked) {
+                emrText += `(${counter++}) Standard Radiotherapy Completed\nAdjuvant RT to _______________ — completed ____/____/____.\n\n`;
+            }
+            if (document.getElementById('endo_12w').checked) {
+                emrText += `(${counter++}) Endocrine Therapy Within 12 Weeks\nEndocrine therapy commenced ____/____/____ — within 12 weeks of initiation.\n\n`;
+            }
+            if (document.getElementById('surg_16m').checked) {
+                emrText += `(${counter++}) Within 16 Months of Surgery\nSurgery performed ____/____/____ — within 16 months elapsed at time of application.\n`;
+            }
+
+            navigator.clipboard.writeText(emrText).then(() => {
+                let t = document.getElementById('toast');
+                let copyBtn = document.getElementById('copyBtn');
+                let originalText = copyBtn.innerText;
+                
+                t.style.opacity = 1;
+                copyBtn.innerText = "✅ 已複製！可直接貼上";
+                copyBtn.style.backgroundColor = "#10b981"; 
+
+                setTimeout(() => { 
+                    t.style.opacity = 0; 
+                    copyBtn.innerText = originalText;
+                    copyBtn.style.backgroundColor = "#1e293b"; 
+                }, 2500);
+            }).catch(err => {
+                alert("複製失敗，請檢查瀏覽器權限設定。");
+            });
+        }
+
+        function resetForm() { 
+            document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false); 
+            runCalc(); 
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        runCalc();
+    </script>
+</body>
+</html>
