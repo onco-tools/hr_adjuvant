@@ -1,387 +1,1084 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Abemaciclib (Verzenio) 早期乳癌評估與 AE 管理工具</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
-        body { background-color: #f8fafc; font-family: 'Inter', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
-        .card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03); padding: 24px; margin-bottom: 20px; border: 1px solid #f1f5f9; }
-        .section-header { display: flex; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #f1f5f9; }
-        .section-title { font-size: 1.125rem; font-weight: 700; color: #1e293b; }
-        .check-row { display: flex; align-items: flex-start; padding: 14px 16px; background: #f8fafc; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; -webkit-tap-highlight-color: transparent; }
-        .check-row:has(input:checked) { background: #eff6ff; border-color: #bfdbfe; }
-        .check-row input[type="checkbox"] { margin-top: 3px; margin-right: 14px; width: 20px; height: 20px; flex-shrink: 0; accent-color: #2563eb; cursor: pointer; }
-        .check-text { font-size: 1rem; color: #334155; line-height: 1.5; font-weight: 500; pointer-events: none; }
-        .check-subtext { display: block; font-size: 0.85rem; color: #64748b; margin-top: 4px; font-weight: 400; }
-        .sub-group { margin-left: 12px; padding-left: 16px; border-left: 2px solid #e2e8f0; margin-bottom: 16px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ER+/HER2− 早期乳癌輔助工具</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+:root{--navy:#0c2340;--bg:#f0f4f8;}
+body{background:var(--bg);font-family:'Noto Sans TC',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;color:#1e293b;}
 
-        /* 副作用速查視窗 */
-        #aeModal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: white; border-radius: 24px; width: 100%; max-width: 32rem; max-height: 85vh; overflow-y: auto; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
-        .modal-content::-webkit-scrollbar { width: 6px; }
-        .modal-content::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+.tab-nav{display:flex;gap:3px;background:white;border-radius:16px;padding:5px;box-shadow:0 2px 10px rgba(0,0,0,0.07);overflow-x:auto;margin-bottom:16px;}
+.tab-nav::-webkit-scrollbar{display:none;}
+.tab-btn{flex-shrink:0;padding:9px 12px;border-radius:11px;border:none;cursor:pointer;font-weight:700;font-size:0.77rem;transition:all 0.18s;white-space:nowrap;background:transparent;color:#64748b;font-family:inherit;}
+.tab-btn.active{background:var(--navy);color:white;box-shadow:0 2px 8px rgba(12,35,64,0.3);}
+.tab-content{display:none;}
+.tab-content.active{display:block;animation:fi 0.2s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
-        .result-floating { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 28rem; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); z-index: 50; overflow: hidden; transition: 0.3s; }
-        @supports (backdrop-filter: blur(12px)) { .result-floating.bg-gray-500 { background: rgba(100, 116, 139, 0.95); backdrop-filter: blur(12px); } .result-floating.bg-emerald-500 { background: rgba(16, 185, 129, 0.95); backdrop-filter: blur(12px); } .result-floating.bg-amber-500 { background: rgba(245, 158, 11, 0.95); backdrop-filter: blur(12px); } }
-        .result-inner { padding: 20px 24px; text-align: center; }
-        .action-btn { margin-top: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; padding: 12px; border-radius: 9999px; width: 100%; cursor: pointer; border: none; transition: 0.1s; text-decoration: none; }
-        .btn-dark { background-color: #1e293b; color: white; }
-        .btn-orange { background-color: white; color: #d97706; }
-        .hidden { display: none !important; }
-        #toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 12px 24px; border-radius: 9999px; font-weight: 600; opacity: 0; transition: 0.3s; z-index: 1000; pointer-events: none; }
+.card{background:white;border-radius:14px;padding:18px;margin-bottom:12px;border:1px solid #e2e8f0;box-shadow:0 1px 6px rgba(0,0,0,0.03);}
+.card-title{font-size:0.95rem;font-weight:900;color:#0f172a;margin-bottom:3px;}
+.card-sub{font-size:0.78rem;color:#64748b;margin-bottom:12px;}
 
-        /* 圖像化 UI 專用 */
-        .info-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
-        .step-arrow { color: #cbd5e1; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
-    </style>
+/* section divider inside a tab */
+.ae-section-hdr{display:flex;align-items:center;gap:8px;margin:16px 0 10px;padding-bottom:8px;border-bottom:2px solid #e2e8f0;}
+.ae-section-hdr .ae-pill{font-size:0.72rem;font-weight:800;padding:3px 10px;border-radius:20px;}
+.ae-pill-a{background:#1e40af;color:white;}
+.ae-pill-r{background:#475569;color:white;}
+
+.cr{display:flex;align-items:flex-start;padding:10px 12px;background:#f8fafc;border-radius:8px;margin-bottom:6px;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}
+.cr:has(input:checked){background:#f0f7ff;border-color:#bfdbfe;}
+.cr.auto-ok{background:#f0fdf4!important;border-color:#86efac!important;}
+.cr input{margin-top:2px;margin-right:10px;width:16px;height:16px;flex-shrink:0;accent-color:#1e40af;cursor:pointer;}
+.cr.indent{margin-left:18px;}
+.cr-label{font-size:0.85rem;font-weight:600;color:#1e293b;}
+.cr-sub{font-size:0.76rem;color:#64748b;margin-top:2px;}
+.ki67-mark{font-size:0.7rem;color:#92400e;font-weight:700;background:#fef9c3;border:1px solid #fde68a;padding:1px 5px;border-radius:3px;margin-left:5px;}
+.ev-link{font-size:0.68rem;color:#0369a1;background:#f0f9ff;border:1px dashed #7dd3fc;padding:1px 6px;border-radius:3px;cursor:pointer;font-weight:700;font-family:inherit;margin-left:3px;}
+
+.bd{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:0.7rem;font-weight:700;margin:2px 2px 2px 0;}
+.bd-g{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;}
+.bd-b{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;}
+.bd-y{background:#fefce8;color:#854d0e;border:1px solid #fde68a;}
+.bd-s{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;}
+.bd-p{background:#faf5ff;color:#6b21a8;border:1px solid #e9d5ff;}
+
+.date-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.date-cell label{font-size:0.73rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px;}
+.date-cell input{width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 11px;font-size:0.83rem;font-family:inherit;outline:none;box-sizing:border-box;}
+.date-cell input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,0.08);}
+.date-cell input.v{border-color:#10b981;background:#f0fdf4;}
+.date-cell input.iv{border-color:#f87171;background:#fff1f2;}
+.dbadge{font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:3px;margin-top:3px;display:inline-block;}
+.db-ok{background:#dcfce7;color:#166534;} .db-bad{background:#fee2e2;color:#991b1b;}
+
+.dl{list-style:none;padding:0;margin:0;font-size:0.83rem;color:#475569;}
+.dl li{margin-bottom:4px;padding-left:12px;text-indent:-12px;}
+.dl li::before{content:"·";color:#94a3b8;margin-right:5px;}
+.hl{font-weight:700;color:#0f172a;}
+.rd{font-weight:700;color:#b91c1c;}
+
+.ds{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;margin-bottom:6px;border:1.5px solid transparent;gap:8px;}
+.g1{background:#f0fdf4;border-color:#bbf7d0;} .g2{background:#fefce8;border-color:#fde68a;}
+.g2r{background:#fff7ed;border-color:#fed7aa;} .g3{background:#fff1f2;border-color:#fecdd3;}
+
+.acc-btn{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;cursor:pointer;font-family:inherit;text-align:left;padding:0;}
+.acc-btn .ch{transition:transform 0.2s;font-size:0.75rem;color:#94a3b8;margin-left:6px;flex-shrink:0;}
+.acc-btn.open .ch{transform:rotate(180deg);}
+.acc-body{display:none;margin-top:10px;}
+.acc-body.open{display:block;animation:fi 0.15s ease;}
+
+table.ct{width:100%;border-collapse:collapse;font-size:0.83rem;}
+table.ct th{background:#f8fafc;font-weight:700;color:#475569;padding:8px 11px;border-bottom:2px solid #e2e8f0;text-align:left;}
+table.ct td{padding:9px 11px;border-bottom:1px solid #f1f5f9;vertical-align:top;}
+
+/* Main comparison table */
+.tw{background:white;border-radius:14px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 2px 12px rgba(0,0,0,0.04);margin-bottom:12px;}
+.ts{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table.mt{width:100%;min-width:580px;border-collapse:collapse;text-align:left;table-layout:fixed;}
+table.mt col.c0{width:100px;} table.mt col.c1{width:50%;} table.mt col.c2{width:50%;}
+table.mt th,table.mt td{padding:11px 14px;border-bottom:1px solid #f1f5f9;vertical-align:top;line-height:1.55;font-size:0.82rem;color:#334155;}
+table.mt th{background:#f8fafc;font-weight:700;color:#64748b;font-size:0.76rem;letter-spacing:0.02em;border-bottom:2px solid #e2e8f0;position:sticky;top:0;z-index:10;text-transform:uppercase;}
+table.mt th:first-child,table.mt td:first-child{position:sticky;left:0;background:#f8fafc;z-index:20;font-weight:600;color:#64748b;border-right:1px solid #e2e8f0;font-size:0.75rem;box-shadow:2px 0 5px -2px rgba(0,0,0,0.04);text-transform:none;letter-spacing:0;}
+table.mt th:first-child{z-index:30;text-transform:uppercase;letter-spacing:0.02em;}
+.th-a{background:#f8fafc!important;border-bottom:3px solid #1e40af!important;}
+.th-r{background:#f8fafc!important;border-bottom:3px solid #64748b!important;}
+.sh td{background:#f5f7f9!important;color:#475569;font-weight:600;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font-size:0.76rem;text-transform:none;}
+/* Nested tables inside collapsible rows — same col widths */
+table.inner{width:100%;border-collapse:collapse;font-size:0.8rem;table-layout:fixed;}
+table.inner td:nth-child(1){width:100px;padding:10px 14px;font-weight:600;color:#64748b;border-right:1px solid #f1f5f9;vertical-align:top;font-size:0.75rem;}
+table.inner td:nth-child(2),table.inner td:nth-child(3){padding:10px 14px;vertical-align:top;color:#334155;}
+table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
+
+.cf{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:12px 14px;font-size:0.74rem;font-family:'Courier New',monospace;color:#334155;white-space:pre-wrap;line-height:1.8;}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:9999px;font-weight:700;font-size:0.82rem;border:none;cursor:pointer;transition:all 0.15s;text-decoration:none;font-family:inherit;}
+.bn{background:var(--navy);color:white;} .bn:hover{background:#1a3a5c;} .bn:disabled{opacity:.5;cursor:not-allowed;}
+.bw{background:white;color:#374151;border:1.5px solid #e2e8f0;} .bw:hover{background:#f8fafc;}
+.bf{width:100%;}
+
+.sdm-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.sdm-card{border-radius:12px;padding:14px;border:1.5px solid;}
+.sdm-a{background:#f8fafc;border-color:#1e40af;}
+.sdm-r{background:#f8fafc;border-color:#64748b;}
+
+.emr-summary-row{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-radius:5px;font-size:0.81rem;margin-bottom:3px;}
+.emr-ok{background:#f0fdf4;color:#166534;font-weight:600;}
+.emr-na{background:#f8fafc;color:#94a3b8;}
+
+#toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:8px 20px;border-radius:9999px;font-weight:700;font-size:0.8rem;opacity:0;transition:opacity 0.3s;z-index:9999;pointer-events:none;}
+#result_block{border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;}
+
+@media print{
+  .no-print,.tab-nav{display:none!important}
+  #tab4{display:block!important}
+  body{background:white!important}
+  .tw{box-shadow:none!important;border:none!important}
+  .ts{overflow:visible!important}
+  table.mt{min-width:auto!important}
+  th,td{padding:7px!important;font-size:8pt!important}
+  @page{size:landscape;margin:10mm}
+}
+</style>
 </head>
-<body class="pb-80 pt-6">
-    <div id="toast">✅ 已複製摘要</div>
+<body class="p-4 md:p-6 pb-16">
+<div id="toast"></div>
+<div class="max-w-2xl mx-auto">
 
-    <div id="aeModal">
-        <div class="modal-content p-5 md:p-6">
-            <div class="flex justify-between items-center mb-5 sticky top-0 bg-white z-10 pb-2 border-b border-slate-100">
-                <h2 class="text-xl font-bold text-slate-800">AE 管理與衛教指引</h2>
-                <button onclick="toggleAE(false)" class="text-slate-400 hover:text-slate-600 text-3xl leading-none">&times;</button>
-            </div>
-            
-            <div class="space-y-6">
-                
-                <div>
-                    <h3 class="font-bold text-slate-700 text-sm mb-2">🗣️ 預期管理與飲食衛教</h3>
-                    <div class="bg-sky-50 border border-sky-100 rounded-xl p-4">
-                        <div class="mb-4">
-                            <span class="font-bold text-sky-900 block mb-2">【預期管理】打預防針，降低恐慌</span>
-                            <ul class="list-disc pl-5 text-slate-700 text-sm space-y-1.5 leading-relaxed">
-                                <li>腹瀉大多發生在<span class="font-bold text-sky-800">治療第一個月內（中位數約第8天）</span>。</li>
-                                <li>這代表藥物正在發揮作用，只要在第一次發生時適當處置，<span class="font-bold text-sky-800">後續的發生率與嚴重度就會大幅下降</span>。</li>
-                            </ul>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-center shadow-sm">
-                                <div class="text-emerald-700 font-bold mb-1 text-sm">✅ 建議飲食 (BRAT)</div>
-                                <div class="text-xl mb-1 tracking-widest">🍌🍚🍎🍞</div>
-                                <div class="text-xs text-emerald-600 font-medium">香蕉/白飯/蘋果泥/吐司</div>
-                            </div>
-                            <div class="bg-rose-50 border border-rose-100 rounded-xl p-3 text-center shadow-sm">
-                                <div class="text-rose-700 font-bold mb-1 text-sm">❌ 務必避免</div>
-                                <div class="text-xl mb-1 tracking-widest">🌶️🥦🍟☕</div>
-                                <div class="text-xs text-rose-600 font-medium leading-relaxed">辛辣 / <span class="font-bold border-b border-rose-300">高纖</span> / <span class="font-bold border-b border-rose-300">油膩</span> / 咖啡因</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <!-- Header -->
+  <div class="mb-5 no-print">
+    <div class="flex items-center justify-between mb-2">
+      <h1 class="text-xl font-black text-slate-900 tracking-tight">ER+/HER2− 早期乳癌輔助工具</h1>
+      <span class="text-xs text-slate-400 flex-shrink-0 ml-3">2026年3月</span>
+    </div>
+  </div>
 
-                <div>
-                    <h3 class="font-bold text-slate-700 text-sm mb-2">💊 止瀉藥 (Loperamide) 給藥流程</h3>
-                    <div class="flex items-stretch justify-between bg-slate-50 border border-slate-200 rounded-xl p-3 shadow-sm">
-                        <div class="text-center flex-1">
-                            <div class="text-xs text-slate-500 mb-1">首次發生</div>
-                            <div class="font-bold text-slate-800 text-lg">2 顆</div>
-                        </div>
-                        <div class="step-arrow px-1">➔</div>
-                        <div class="text-center flex-1">
-                            <div class="text-xs text-slate-500 mb-1">後續 (每2hr)</div>
-                            <div class="font-bold text-slate-800 text-lg">1 顆</div>
-                        </div>
-                        <div class="step-arrow px-1">➔</div>
-                        <div class="text-center flex-1">
-                            <div class="text-xs text-slate-500 mb-1">每日上限</div>
-                            <div class="font-bold text-rose-600 text-lg">8 顆</div>
-                        </div>
-                    </div>
-                </div>
+  <div class="tab-nav no-print">
+    <button class="tab-btn active" onclick="switchTab('tab1',this)">條件評估</button>
+    <button class="tab-btn" onclick="switchTab('tab2',this)">AE 管理</button>
+    <button class="tab-btn" onclick="switchTab('tab3',this)">事審文字</button>
+    <button class="tab-btn" onclick="switchTab('tab4',this)">藥物對照</button>
+    <button class="tab-btn" onclick="switchTab('tab5',this)">共同決策</button>
+  </div>
 
-                <div>
-                    <h3 class="font-bold text-slate-700 text-sm mb-2">📉 腹瀉分級與降劑量決策</h3>
-                    
-                    <div class="info-card flex items-center justify-between py-3 shadow-sm">
-                        <div>
-                            <span class="inline-block bg-slate-200 text-slate-700 text-xs font-bold px-2 py-1 rounded mb-1">Grade 1</span>
-                            <div class="text-sm font-semibold text-slate-800">每日增加 < 4 次</div>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-emerald-600 font-bold text-sm">✅ 維持原劑量</span>
-                        </div>
-                    </div>
+  <!-- ══════ TAB 1 條件評估 ══════ -->
+  <div id="tab1" class="tab-content active">
+    <div class="card">
+      <div class="card-title">基礎條件</div>
+      <div class="card-sub">全部需符合，方可申請健保給付</div>
+      <label class="cr"><input type="checkbox" id="c_erpr" onchange="runAll()"><div><div class="cr-label">ER/PR &gt; 30%</div></div></label>
+      <label class="cr"><input type="checkbox" id="c_her2" onchange="runAll()"><div><div class="cr-label">HER2 陰性</div></div></label>
+      <label class="cr"><input type="checkbox" id="c_chemo" onchange="runAll()"><div><div class="cr-label">完成標準化療</div><div class="cr-sub">特殊情況未使用可事審允許</div></div></label>
+      <label class="cr"><input type="checkbox" id="c_radio" onchange="runAll()"><div><div class="cr-label">完成放療</div><div class="cr-sub">特殊情況未使用可事審允許</div></div></label>
+      <div class="mt-3 mb-1 px-1 text-xs font-bold text-slate-400">輸入日期後自動計算並打勾</div>
+      <div class="date-row">
+        <div class="date-cell"><label>手術日期</label><input type="date" id="d_surg" oninput="calcDates()"><div id="d_surg_b" class="hidden dbadge"></div></div>
+        <div class="date-cell"><label>內分泌治療開始日</label><input type="date" id="d_endo" oninput="calcDates()"><div id="d_endo_b" class="hidden dbadge"></div></div>
+      </div>
+      <div id="d_note" class="hidden text-xs text-slate-400 px-1 -mt-2 mb-3"></div>
+      <label class="cr" id="row_endo"><input type="checkbox" id="c_endo" onchange="runAll()"><div><div class="cr-label">內分泌治療開始 ≤ 12 週（≤ 84 天）</div><div class="cr-sub">自手術後起算</div></div></label>
+      <label class="cr" id="row_surg"><input type="checkbox" id="c_surg" onchange="runAll()"><div><div class="cr-label">手術後 ≤ 16 個月（≤ 480 天）</div><div class="cr-sub">申請日距手術日</div></div></label>
+    </div>
+    <div class="card">
+      <div class="card-title">高風險條件</div>
+      <div class="card-sub">任一路徑符合即可</div>
+      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1 mb-1.5">Neoadjuvant — 化療前 CNB/FNA</div>
+      <label class="cr"><input type="checkbox" id="c_neo_n13" onchange="runAll()"><div><div class="cr-label">化療前 ALN 1–3 顆（CNB/FNA）</div><div class="cr-sub">含 N1mi，不含鎖骨上或內乳淋巴結</div></div></label>
+      <div id="neo_sub" style="display:none" class="ml-4 pl-3 border-l-2 border-slate-200 mb-2">
+        <label class="cr"><input type="checkbox" id="c_neo_g3" onchange="runAll()"><span class="text-sm text-slate-600">化療前病理（CNB）Grade 3</span></label>
+        <label class="cr"><input type="checkbox" id="c_neo_t5u" onchange="runAll()"><span class="text-sm text-slate-600">化療前影像腫瘤 ≥ 5cm（Unifocal）</span></label>
+        <label class="cr"><input type="checkbox" id="c_neo_t5m" onchange="runAll()"><span class="text-sm text-slate-600">化療前影像腫瘤 ≥ 5cm（Multifocal/Multicentric 加總）</span></label>
+        <label class="cr" style="border:1.5px dashed #fbbf24!important;"><input type="checkbox" id="c_neo_ki67" onchange="runAll()"><div><div class="text-sm text-slate-600">化療前 Ki-67 ≥ 20%（CNB）<span class="ki67-mark">自費條件 · 指引推薦</span></div></div></label>
+      </div>
+      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1 mt-3 mb-1.5">Adjuvant — 手術病理</div>
+      <label class="cr"><input type="checkbox" id="c_adj_n4" onchange="runAll()"><div><div class="cr-label">手術病理 ALN ≥ 4 顆</div></div></label>
+      <label class="cr"><input type="checkbox" id="c_adj_n13" onchange="runAll()"><div><div class="cr-label">手術病理 ALN 1–3 顆</div><div class="cr-sub">含 N1mi，不含鎖骨上或內乳淋巴結</div></div></label>
+      <div id="adj_sub" style="display:none" class="ml-4 pl-3 border-l-2 border-slate-200 mb-2">
+        <label class="cr"><input type="checkbox" id="c_adj_g3" onchange="runAll()"><span class="text-sm text-slate-600">手術病理 Grade 3</span></label>
+        <label class="cr"><input type="checkbox" id="c_adj_t5u" onchange="runAll()"><span class="text-sm text-slate-600">手術病理腫瘤 ≥ 5cm（Unifocal）</span></label>
+        <label class="cr"><input type="checkbox" id="c_adj_t5m" onchange="runAll()"><span class="text-sm text-slate-600">手術病理腫瘤 ≥ 5cm（Multifocal/Multicentric 加總）</span></label>
+        <label class="cr" style="border:1.5px dashed #fbbf24!important;"><input type="checkbox" id="c_adj_ki67" onchange="runAll()"><div><div class="text-sm text-slate-600">手術病理 Ki-67 ≥ 20%<span class="ki67-mark">自費條件 · 指引推薦</span></div></div></label>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">排除條件（健保不給付）</div>
+      <label class="cr"><input type="checkbox" id="c_exc_male" onchange="runAll()"><span class="cr-label">男性患者</span></label>
+      <label class="cr"><input type="checkbox" id="c_exc_erpr" onchange="runAll()"><span class="cr-label">ER/PR ≤ 30%</span></label>
+    </div>
+    <div id="result_block" class="hidden">
+      <div id="result_main" class="text-lg font-black mb-1"></div>
+      <div id="result_sub" class="text-sm"></div>
+      <div id="result_missing" class="hidden mt-3"></div>
+    </div>
+    <div class="mt-4 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。</div>
+  </div>
 
-                    <div class="info-card flex items-center justify-between py-3 shadow-sm">
-                        <div>
-                            <span class="inline-block bg-amber-100 text-amber-700 text-xs font-bold px-2 py-1 rounded mb-1">Grade 2</span>
-                            <div class="text-sm font-semibold text-slate-800">增加 4-6 次 (24hr未緩解)</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-rose-600 font-bold text-sm mb-1">⏸️ 先暫停用藥</div>
-                            <div class="text-emerald-600 font-bold text-sm">✅ 恢復原劑量</div>
-                        </div>
-                    </div>
+  <!-- ══════ TAB 2 AE 管理 ══════ -->
+  <div id="tab2" class="tab-content">
 
-                    <div class="info-card flex items-center justify-between py-3 mb-0 shadow-sm">
-                        <div>
-                            <span class="inline-block bg-rose-100 text-rose-700 text-xs font-bold px-2 py-1 rounded mb-1">Grade 3/4</span>
-                            <div class="text-sm font-semibold text-slate-800">增加 ≥ 7 次 或 反覆發作</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-rose-600 font-bold text-sm mb-1">⏸️ 先暫停用藥</div>
-                            <div class="text-rose-600 font-bold text-sm">⬇️ 降一階劑量</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="border-t border-slate-100 pt-5 mt-2">
-                    <h3 class="font-bold text-slate-700 text-sm mb-3">📊 降劑量不影響長期療效</h3>
-                    
-                    <div class="text-center mb-3">
-                        <img src="dose_reduction.png" alt="降劑量不影響療效數據圖" class="w-full rounded-lg shadow-sm border border-slate-200 mx-auto" onerror="this.src='https://via.placeholder.com/600x300/f8fafc/94a3b8?text=請放入圖檔+dose_reduction.png'">
-                    </div>
-                    
-                    <div class="bg-slate-50 p-3 rounded-lg text-center border border-slate-100 shadow-sm">
-                        <div class="text-sm text-slate-700 font-medium">主動降劑量與原劑量相比，<span class="text-rose-600 font-bold">療效無顯著差異</span></div>
-                        <div class="mt-1 font-bold text-slate-800 text-lg">
-                            HR: 0.905 <span class="text-xs font-normal text-slate-500">(95% CI: 0.727-1.127)</span>
-                        </div>
-                    </div>
-
-                    <p class="text-[10px] text-slate-400 mt-3 text-right">
-                        Ref: Goetz MP, et al. <i>npj Breast Cancer</i>. 2024;10:34.
-                    </p>
-                </div>
-
-            </div>
-            
-            <button onclick="toggleAE(false)" class="action-btn btn-dark mt-6">關閉指引</button>
-        </div>
+    <!-- ── Abema section ── -->
+    <div class="ae-section-hdr">
+      <div class="ae-pill ae-pill-a">Abemaciclib</div>
+      <span class="text-sm font-bold text-slate-700">AE 管理</span>
     </div>
 
-    <div class="max-w-md mx-auto p-4">
-        <div class="flex justify-between items-center mb-6 px-1">
-            <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Verzenio 評估工具</h1>
-            <div class="flex gap-2">
-                <button onclick="toggleAE(true)" class="bg-blue-50 text-blue-600 border border-blue-100 text-xs font-bold py-2 px-3 rounded-full shadow-sm flex items-center">💡 AE 衛教指引</button>
-                <button onclick="resetForm()" class="bg-white text-slate-500 border border-slate-200 text-xs font-bold py-2 px-3 rounded-full shadow-sm flex items-center">重置</button>
-            </div>
+    <!-- Diarrhea -->
+    <div class="card">
+      <div class="card-title">💊 腹瀉管理（主要副作用）</div>
+      <div class="card-sub">發生率 84%，中位數約第 8 天出現；正確處置後後續嚴重度明顯降低</div>
+      <div class="mb-3 bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+        <div class="font-bold text-emerald-800 text-sm mb-2">💊 Loperamide 給藥參考原則</div>
+        <div class="flex items-center justify-around bg-white rounded-lg p-2 border border-emerald-100 text-center">
+          <div><div class="text-xs text-slate-400 mb-0.5">首次腹瀉</div><div class="text-2xl font-black text-slate-800">2</div><div class="text-xs text-slate-500">顆</div></div>
+          <div class="text-slate-300 font-bold">→</div>
+          <div><div class="text-xs text-slate-400 mb-0.5">後續每 2hr</div><div class="text-2xl font-black text-slate-800">1</div><div class="text-xs text-slate-500">顆</div></div>
+          <div class="text-slate-300 font-bold">→</div>
+          <div><div class="text-xs text-slate-400 mb-0.5">每日上限</div><div class="text-2xl font-black text-red-600">8</div><div class="text-xs text-slate-500">顆</div></div>
         </div>
-
-        <div class="card">
-            <div class="section-header"><div class="w-2 h-6 bg-blue-600 rounded-full mr-3"></div><h2 class="section-title mb-0">基本病理與歷程</h2></div>
-            <label class="check-row"><input type="checkbox" id="erpr_gt30" onchange="runCalc()"> <span class="check-text">ER/PR > 30%</span></label>
-            <label class="check-row"><input type="checkbox" id="her2_neg" onchange="runCalc()"> <span class="check-text">HER2 陰性</span></label>
-            <label class="check-row">
-                <input type="checkbox" id="chemo_used" onchange="runCalc()"> 
-                <span class="check-text">使用標準化療 <span class="check-subtext">特殊情況未使用可事審允許</span></span>
-            </label>
-            <label class="check-row">
-                <input type="checkbox" id="radio_used" onchange="runCalc()"> 
-                <span class="check-text">使用放療 <span class="check-subtext">特殊情況未使用可事審允許</span></span>
-            </label>
-            <label class="check-row"><input type="checkbox" id="endo_12w" onchange="runCalc()"> <span class="check-text">內分泌治療 &le; 12 周</span></label>
-            <label class="check-row"><input type="checkbox" id="surg_16m" onchange="runCalc()"> <span class="check-text">手術後 &le; 16 個月</span></label>
+      </div>
+      <div class="ds g1"><div><span class="bd bd-g">Grade 1</span><div class="font-bold text-sm mt-0.5">排便增加 &lt; 4 次/天</div></div><div class="text-right flex-shrink-0"><div class="font-bold text-emerald-700 text-sm">繼續 150mg BID</div></div></div>
+      <div class="ds g2"><div><span class="bd bd-y">Grade 2</span><div class="font-bold text-sm mt-0.5">增加 4–6 次（24hr 未緩解）</div></div><div class="text-right flex-shrink-0"><div class="text-sm font-bold text-slate-600">暫停</div><div class="font-bold text-emerald-700 text-sm">→ 恢復原劑量</div></div></div>
+      <div class="ds g2r"><div><span class="bd bd-y">Grade 2 反覆</span><div class="font-bold text-sm mt-0.5">同劑量再次出現</div></div><div class="text-right flex-shrink-0"><div class="font-bold text-orange-600 text-sm">暫停 → 150→100mg BID</div></div></div>
+      <div class="ds g3"><div><span class="bd">Grade 3/4</span><div class="font-bold text-sm mt-0.5">增加 ≥ 7 次 / 住院</div></div><div class="text-right flex-shrink-0"><div class="font-bold text-red-700 text-sm">暫停 → 降一階劑量</div></div></div>
+      <!-- Dose reduction efficacy highlight -->
+      <div class="mt-3" style="background:#dcfce7;border:1.5px solid #86efac;border-radius:12px;padding:12px 14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:900;color:#166534;font-size:0.88rem;margin-bottom:2px;">✅ 降劑量不影響長期療效</div>
+            <div style="font-size:0.78rem;color:#475569;">降劑量組 vs 原劑量組 — 療效無顯著差異</div>
+            <div style="font-size:0.68rem;color:#6b7280;margin-top:2px;">Goetz MP, et al. <em>npj Breast Cancer</em>. 2024;10:34.</div>
+          </div>
+          <div style="text-align:center;flex-shrink:0;">
+            <div style="font-weight:900;color:#0f172a;font-size:1.1rem;">HR 0.905</div>
+            <div style="font-size:0.72rem;color:#64748b;">95% CI 0.727–1.127</div>
+          </div>
         </div>
+      </div>
+      <div class="mt-3 flex items-center justify-between bg-slate-50 rounded-xl px-4 py-3 border border-slate-200 flex-wrap gap-2">
+        <div class="font-bold text-slate-700 text-sm">降劑量選項</div>
+        <div class="flex items-center gap-1 text-sm font-bold text-slate-700 flex-shrink-0"><span class="bg-white border border-slate-300 rounded px-2 py-0.5">150 BID</span><span class="text-slate-300">→</span><span class="bg-white border border-slate-300 rounded px-2 py-0.5">100 BID</span><span class="text-slate-300">→</span><span class="bg-white border border-slate-300 rounded px-2 py-0.5">50 BID</span></div>
+      </div>
+    </div>
 
-        <div class="card">
-            <div class="section-header"><div class="w-2 h-6 bg-blue-600 rounded-full mr-3"></div><h2 class="section-title mb-0">High-Risk Criteria</h2></div>
-            
-            <h3 class="font-bold text-slate-700 mb-2 px-1 text-sm">▶ Neoadjuvant chemo</h3>
-            <label class="check-row">
-                <input type="checkbox" id="neo_n1_3" onchange="runCalc()"> 
-                <span class="check-text">化療前 ALN 1-3 顆(CNB/FNA) <span class="check-subtext">含N1mi，不含鎖骨上或內乳淋巴結</span></span>
-            </label>
-            <div class="sub-group">
-                <label class="check-row"><input type="checkbox" id="neo_g3" onchange="runCalc()"> <span class="check-text text-sm">化療前 Tumor病理(CNB) Grade 3</span></label>
-                <label class="check-row"><input type="checkbox" id="neo_t5_uni" onchange="runCalc()"> <span class="check-text text-sm">化療前 Tumor影像 &ge; 5cm (Unifocal)</span></label>
-                <label class="check-row"><input type="checkbox" id="neo_t5_multi" onchange="runCalc()"> <span class="check-text text-sm">化療前 Tumor影像 &ge; 5cm (Multifocal/Multicentric加總)</span></label>
+    <!-- Diet -->
+    <div class="card">
+      <div class="card-title">🥗 腹瀉飲食衛教</div>
+      <div class="grid grid-cols-2 gap-3 mt-1">
+        <div class="bg-emerald-50 rounded-xl p-3 border border-emerald-100 text-xs">
+          <div class="font-bold text-emerald-700 mb-2">✅ 建議飲食（BRAT）</div>
+          <div class="space-y-1.5 text-emerald-800">
+            <div>🍌 香蕉</div>
+            <div>🍚 白飯 / 白吐司</div>
+            <div>🍎 蘋果泥</div>
+            <div class="mt-1 text-emerald-600 text-xs">少量多餐、多補充水分</div>
+          </div>
+        </div>
+        <div class="rounded-xl p-3 border text-xs" style="background:#fff8f8;border-color:#fecaca;">
+          <div class="font-bold mb-2" style="color:#991b1b;">❌ 務必避免</div>
+          <div class="space-y-1.5" style="color:#7f1d1d;">
+            <div>🌶️ 辛辣食物</div>
+            <div>🥦 高纖維食物</div>
+            <div>🍟 油膩食物</div>
+            <div>🥛 奶製品（牛奶、冰淇淋）</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Blood -->
+    <div class="card">
+      <button class="acc-btn" onclick="toggleAcc('acc_hem',this)"><div class="card-title mb-0">🩸 嗜中性球低下 / 血液毒性</div><span class="ch">▼</span></button>
+      <div id="acc_hem" class="acc-body">
+        <div class="text-xs text-slate-500 mb-2 mt-2">嗜中性球低下症（實驗室數值）G3/4 發生率 18%；首次 G3 暫停但不需降劑量，復發性 G3 或 G4 才降劑量</div>
+        <table class="ct"><thead><tr><th>CTCAE 等級</th><th>處置（依 TFDA 仿單 表2）</th></tr></thead><tbody>
+          <tr><td>G1 / G2</td><td class="font-bold text-emerald-700">無需調整劑量，繼續治療</td></tr>
+          <tr><td><span class="bd bd-y">G3</span>（首次）</td><td>暫停至 ≤ G2 恢復 → <strong>無需降劑量</strong>，恢復原劑量</td></tr>
+          <tr><td><span class="bd" style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;">G3 復發</span> 或 <span class="bd" style="background:#fff1f2;color:#991b1b;border:1px solid #fecaca;">G4</span></td><td class="rd">暫停至 ≤ G2 → 降一階劑量恢復</td></tr>
+        </tbody></table>
+        <div class="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-xs text-amber-800">CBC 監測：治療前 → 前 2 個月每 2 週一次 → 之後 2 個月每月一次 → 之後依臨床需要。發燒 ≥ 38°C 立即回診。</div>
+      </div>
+    </div>
+
+    <!-- LFT -->
+    <div class="card">
+      <button class="acc-btn" onclick="toggleAcc('acc_lft',this)"><div class="card-title mb-0">🧪 肝功能異常</div><span class="ch">▼</span></button>
+      <div id="acc_lft" class="acc-body">
+        <div class="text-xs text-slate-500 mb-2 mt-2">monarchE ALT↑ 37% (G3: 2.5%)、AST↑ 31% (G3: 1.5%)；LFT 監測排程同 CBC</div>
+        <table class="ct"><thead><tr><th>ALT/AST 等級</th><th>處置（依 TFDA 仿單 表4）</th></tr></thead><tbody>
+          <tr><td>G1 / G2（未合併膽紅素 &gt;2× ULN）</td><td class="font-bold text-emerald-700">無需調整劑量</td></tr>
+          <tr><td><span class="bd bd-y">G2 持續或復發</span>、或 G3（5–20× ULN）</td><td>暫停至恢復基準值或 ≤ G1 → 降一階劑量恢復</td></tr>
+          <tr><td>ALT/AST &gt;3× ULN 且膽紅素 &gt;2× ULN（無膽汁淤積）</td><td class="rd">永久停藥（Hy's Law）</td></tr>
+          <tr><td><span class="bd" style="background:#fff1f2;color:#991b1b;border:1px solid #fecaca;">G4</span> (&gt;20× ULN)</td><td class="rd">永久停藥</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <!-- Creatinine -->
+    <div class="card">
+      <button class="acc-btn" onclick="toggleAcc('acc_cr',this)"><div class="card-title mb-0">🔬 肌酸酐升高（機轉性）</div><span class="ch">▼</span></button>
+      <div id="acc_cr" class="acc-body">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800 mt-2">
+          <div class="font-bold mb-1">發生率 ≈ 99%（monarchE），非真性腎損傷</div>
+          <div class="text-xs text-blue-700">機轉：Abemaciclib 及其活性代謝產物抑制腎小管轉運蛋白 OCT2、MATE1 及 MATE2-K，阻斷肌酸酐主動分泌，造成血清肌酸酐上升（平均約 0.2–0.3 mg/dL），但 GFR（腎絲球過濾率）實際未下降。治療停止後可恢復正常。<br>可用非肌酸酐標記（BUN、Cystatin C 或估算 eGFR）評估真實腎功能。無需因此調整或停藥。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ILD -->
+    <div class="card">
+      <button class="acc-btn" onclick="toggleAcc('acc_ild',this)"><div class="card-title mb-0">🫁 間質性肺炎（ILD）</div><span class="ch">▼</span></button>
+      <div id="acc_ild" class="acc-body">
+        <div class="text-xs text-slate-500 mb-2 mt-2">monarchE 發生率 3%（G3/4：0.4%）；有 1 例致死（0.1%）</div>
+        <table class="ct"><thead><tr><th>Grade</th><th>處置（依 TFDA 仿單 表5）</th></tr></thead><tbody>
+          <tr><td><span class="bd bd-g">G1 / G2</span></td><td class="font-bold text-emerald-700">無需調整劑量，密切監測</td></tr>
+          <tr><td><span class="bd bd-y">G2 持續或復發</span>，給予最大支持性治療仍未於 7 天內緩解至 ≤ G1</td><td>暫停至恢復基準值或 ≤ G1 → 降一階劑量恢復</td></tr>
+          <tr><td><span class="bd" style="background:#fff1f2;color:#991b1b;border:1px solid #fecaca;">G3 / G4</span></td><td class="rd">永久停藥</td></tr>
+        </tbody></table>
+        <div class="mt-2 text-xs text-slate-500">症狀：缺氧、咳嗽、呼吸困難、影像浸潤 → 胸部 X-ray / CT 評估，排除感染/腫瘤等其他原因</div>
+      </div>
+    </div>
+
+    <!-- VTE -->
+    <div class="card">
+      <button class="acc-btn" onclick="toggleAcc('acc_vte',this)"><div class="card-title mb-0">🦵 靜脈血栓栓塞（VTE）</div><span class="ch">▼</span></button>
+      <div id="acc_vte" class="acc-body">
+        <div class="text-xs text-slate-500 mb-2 mt-2">monarchE 發生率 3%（DVT、PE 及其他）；臨床上曾有致死案例</div>
+        <table class="ct"><thead><tr><th>情境</th><th>處置（依 TFDA 仿單 表6）</th></tr></thead><tbody>
+          <tr><td>早期乳癌（EBC）— 任何等級</td><td>暫停用藥，給予臨床處置；病人臨床情況穩定後恢復 Verzenio 治療</td></tr>
+        </tbody></table>
+        <ul class="dl mt-2"><li>症狀：肢體疼痛腫脹、呼吸短促、胸痛、心跳過快</li><li>確診 DVT/PE → 依標準抗凝治療；密切評估是否恢復用藥</li><li>高風險病人（長期臥床、肥胖、既往 VTE）評估預防性抗凝</li></ul>
+      </div>
+    </div>
+
+    <!-- Handout -->
+    <div class="card">
+      <div class="card-title">📋 病人衛教單張</div>
+      <div class="card-sub">居家照護說明，可截圖列印交給病人</div>
+      <div id="handout-area" style="border-radius:10px;overflow:hidden;border:1.5px solid #e2e8f0;">
+        <div style="background:#0c2340;color:white;padding:12px 16px;"><div class="text-sm font-black">捷癌寧 (Verzenio®) 居家照護指引</div><div class="text-xs opacity-70 mt-0.5">早期乳癌輔助治療</div></div>
+        <div class="p-4 bg-white space-y-3">
+          <div class="bg-amber-50 border border-amber-200 rounded-lg p-3"><div class="font-bold text-amber-800 text-sm mb-1">⏰ 用藥方式</div><div class="text-sm text-amber-800">每天<strong>早餐後</strong>一顆、<strong>晚餐後</strong>一顆（間隔約 12 小時）</div><div class="text-xs text-amber-600 mt-1">忘記服藥不需補服，下次正常時間繼續</div></div>
+          <div>
+            <div class="font-bold text-sm text-slate-700 mb-1.5">🚽 腹瀉的預防與處理</div>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="bg-emerald-50 rounded-lg p-2.5 border border-emerald-100 text-xs"><div class="font-bold text-emerald-700 mb-1">✅ 建議（BRAT）</div><div class="text-emerald-800">香蕉、白飯<br>蘋果泥、白吐司</div></div>
+              <div class="bg-slate-50 rounded-lg p-2.5 border border-slate-200 text-xs"><div class="font-bold text-slate-700 mb-1">❌ 避免</div><div class="text-slate-600">辛辣、高纖維<br>油膩、奶製品</div></div>
             </div>
-            <label class="check-row"><input type="checkbox" id="neo_ki67" onchange="runCalc()"> <span class="check-text">化療前 Ki-67 &ge; 20%(CNB) <span class="check-subtext text-amber-600 font-bold">自費條件</span></span></label>
+            <div class="mt-2 bg-blue-50 rounded-lg p-2.5 border border-blue-100 text-xs"><div class="font-bold text-blue-800 mb-0.5">💊 Loperamide 參考</div><div class="text-blue-700">首次 → <strong>2 顆</strong>；每 2hr → <strong>1 顆</strong>；上限 <strong>8 顆/天</strong></div></div>
+          </div>
+          <div>
+            <div class="font-bold text-sm text-slate-700 mb-1.5">⚠️ 出現以下症狀請立即回診</div>
+            <div class="grid grid-cols-2 gap-1.5 text-xs">
+              <div class="bg-red-50 rounded-lg p-2 border border-red-100 text-red-700 font-semibold">🌡️ 發燒 ≥ 38°C</div>
+              <div class="bg-red-50 rounded-lg p-2 border border-red-100 text-red-700 font-semibold">🚽 腹瀉 ≥ 7 次/天</div>
+              <div class="bg-red-50 rounded-lg p-2 border border-red-100 text-red-700 font-semibold">😮‍💨 呼吸困難惡化</div>
+              <div class="bg-red-50 rounded-lg p-2 border border-red-100 text-red-700 font-semibold">🦵 單腳腫脹疼痛</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button onclick="downloadHandout()" class="btn bn bf mt-3">📥 下載衛教單截圖</button>
+    </div>
 
-            <div class="border-t border-slate-100 pt-4 mt-2">
-                <h3 class="font-bold text-slate-700 mb-2 px-1 text-sm">▶ Adjuvant chemo</h3>
-                <label class="check-row"><input type="checkbox" id="adj_n4" onchange="runCalc()"> <span class="check-text">手術病理 ALN &ge; 4 顆</span></label>
-                <label class="check-row">
-                    <input type="checkbox" id="adj_n1_3" onchange="runCalc()"> 
-                    <span class="check-text">手術病理 ALN 1-3 顆 <span class="check-subtext">含N1mi，不含鎖骨上或內乳淋巴結</span></span>
-                </label>
-                <div class="sub-group">
-                    <label class="check-row"><input type="checkbox" id="adj_g3" onchange="runCalc()"> <span class="check-text text-sm">手術病理 Grade 3</span></label>
-                    <label class="check-row"><input type="checkbox" id="adj_t5_uni" onchange="runCalc()"> <span class="check-text text-sm">手術病理 Tumor &ge; 5cm (Unifocal)</span></label>
-                    <label class="check-row"><input type="checkbox" id="adj_t5_multi" onchange="runCalc()"> <span class="check-text text-sm">手術病理 Tumor &ge; 5cm (Multifocal/Multicentric加總)</span></label>
+    <!-- ── Ribo section ── -->    <div class="ae-section-hdr mt-4">
+      <div class="ae-pill ae-pill-r">Ribociclib</div>
+      <span class="text-sm font-bold text-slate-700">AE 管理參考</span>
+    </div>
+
+    <!-- Ribo neutropenia -->
+    <div class="card">
+      <button class="acc-btn" onclick="toggleAcc('acc_r_neu',this)"><div class="card-title mb-0">🩸 嗜中性球低下（主要副作用）</div><span class="ch">▼</span></button>
+      <div id="acc_r_neu" class="acc-body">
+        <div class="text-xs text-slate-500 mb-2 mt-2">G3/4 發生率 45%；嗜中性球低下為 NATALEE 最主要停藥及降劑量原因</div>
+        <table class="ct"><thead><tr><th>Grade</th><th>處置</th></tr></thead><tbody>
+          <tr><td>G1–2</td><td>繼續，每 2 週監測 CBC</td></tr>
+          <tr><td><span class="bd" style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;">G3</span>（首次）</td><td>暫停 → 恢復 ≤ G1 → 恢復原劑量</td></tr>
+          <tr><td><span class="bd" style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;">G3 復發</span></td><td>暫停 → 恢復後降一階劑量（400mg→200mg）</td></tr>
+          <tr><td><span class="bd" style="background:#fff1f2;color:#991b1b;border:1px solid #fecaca;">G4</span></td><td class="rd">暫停 → 恢復後降一階劑量</td></tr>
+        </tbody></table>
+        <div class="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-xs text-amber-800">CBC 監測：治療前 → 前 2 月每 2 週 → 之後每 4 週期開始時。發燒 ≥ 38°C 立即回診。</div>
+      </div>
+    </div>
+
+    <!-- Ribo LFT -->
+    <div class="card">
+      <button class="acc-btn" onclick="toggleAcc('acc_r_lft',this)"><div class="card-title mb-0">🧪 肝功能異常（Ribociclib）</div><span class="ch">▼</span></button>
+      <div id="acc_r_lft" class="acc-body">
+        <div class="text-xs text-slate-500 mb-2 mt-2">ALT↑ 45%（G3/4: 8%）、AST↑ 44%（G3/4: 5%）；明顯高於 Abemaciclib；為最主要永久停藥原因（8%）</div>
+        <table class="ct"><thead><tr><th>Grade</th><th>處置</th></tr></thead><tbody>
+          <tr><td>G1–2（未合併膽紅素升高）</td><td>繼續，加強監測 LFT 頻率</td></tr>
+          <tr><td><span class="bd" style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;">G3</span>（5–20× ULN）</td><td>暫停 → 恢復後降一階劑量</td></tr>
+          <tr><td>ALT/AST &gt;3× ULN 且膽紅素 &gt;2× ULN</td><td class="rd">永久停藥（Hy's Law）</td></tr>
+          <tr><td><span class="bd" style="background:#fff1f2;color:#991b1b;border:1px solid #fecaca;">G4</span>（&gt;20× ULN）</td><td class="rd">永久停藥</td></tr>
+        </tbody></table>
+        <div class="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-xs text-amber-800">LFT 監測：治療前 → 前 2 月每 2 週 → 之後每 4 週期開始時</div>
+      </div>
+    </div>
+
+    <!-- Ribo QTc -->
+    <div class="card">
+      <button class="acc-btn" onclick="toggleAcc('acc_r_qt',this)"><div class="card-title mb-0">❤️‍🩹 QTc 延長</div><span class="ch">▼</span></button>
+      <div id="acc_r_qt" class="acc-body">
+        <div class="text-xs text-slate-500 mb-2 mt-2">需定期 ECG；避免 QT 延長藥物；每次 ECG 前補充電解質</div>
+        <table class="ct"><thead><tr><th>QTc 數值</th><th>處置</th></tr></thead><tbody>
+          <tr><td>&lt; 481ms</td><td>繼續原劑量</td></tr>
+          <tr><td>481–500ms</td><td>暫停 → QTc 恢復 &lt;481ms 後恢復原劑量</td></tr>
+          <tr><td>&gt; 500ms 或症狀性</td><td class="rd">暫停 → 恢復後降一階劑量；再次 &gt;500ms → 永久停藥</td></tr>
+        </tbody></table>
+        <div class="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-xs text-amber-800">ECG 監測：治療前 + 第1週期 D14 + 前6週期每週期開始時。維持 K⁺ ≥ 4.0 mEq/L、Mg²⁺ 正常值。</div>
+      </div>
+    </div>
+
+    <!-- Ribo ILD -->
+    <div class="card">
+      <button class="acc-btn" onclick="toggleAcc('acc_r_ild',this)"><div class="card-title mb-0">🫁 間質性肺病（Ribociclib）</div><span class="ch">▼</span></button>
+      <div id="acc_r_ild" class="acc-body">
+        <div class="text-xs text-slate-500 mb-2 mt-2">發生率約 1.5%，低於 Abemaciclib（3%）</div>
+        <table class="ct"><thead><tr><th>Grade</th><th>處置</th></tr></thead><tbody>
+          <tr><td>G1–2</td><td>暫停；考慮類固醇；恢復後可降階使用</td></tr>
+          <tr><td><span class="bd" style="background:#fff1f2;color:#991b1b;border:1px solid #fecaca;">G3–4</span></td><td class="rd">永久停藥 + 類固醇治療</td></tr>
+        </tbody></table>
+        <div class="mt-2 text-xs text-slate-500">新發呼吸困難、咳嗽、發燒 → 胸部 X-ray / CT 評估</div>
+      </div>
+    </div>
+
+    <!-- Ribo skin -->
+    <div class="card">
+      <button class="acc-btn" onclick="toggleAcc('acc_r_skin',this)"><div class="card-title mb-0">🔴 皮膚反應</div><span class="ch">▼</span></button>
+      <div id="acc_r_skin" class="acc-body">
+        <div class="text-xs text-slate-500 mb-2 mt-2">皮疹 G3/4 約 0.9%；Stevens-Johnson Syndrome / Toxic Epidermal Necrolysis（SJS/TEN）有罕見案例</div>
+        <table class="ct"><thead><tr><th>Grade</th><th>處置</th></tr></thead><tbody>
+          <tr><td>G1–2</td><td>繼續，局部治療；密切觀察</td></tr>
+          <tr><td><span class="bd" style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;">G3</span></td><td>暫停 → 恢復後降一階劑量</td></tr>
+          <tr><td><span class="bd" style="background:#fff1f2;color:#991b1b;border:1px solid #fecaca;">G4</span> / SJS / TEN</td><td class="rd">永久停藥</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <!-- ── Ribo section ends ── -->
+    <div class="mt-4 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。</div>
+
+  </div><!-- /tab2 -->
+
+  <!-- ══════ TAB 3 事審文字 ══════ -->
+  <div id="tab3" class="tab-content">
+    <div class="card">
+      <div class="card-title">健保事審申請文字產生器</div>
+      <div class="card-sub">條件自動讀取自「條件評估」，補充病人基本資料即可產生申請摘要</div>
+      <div class="mb-4">
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">病人基本資料（選填）</div>
+        <div class="date-row">
+          <div class="date-cell"><label>病歷號 / 姓名</label><input type="text" id="np_pid" placeholder="00000000 / 王○○" oninput="buildNP()"></div>
+          <div class="date-cell"><label>手術日期</label><input type="date" id="np_surg" oninput="buildNP()"></div>
+          <div class="date-cell"><label>化療結束日</label><input type="date" id="np_chemo_end" oninput="buildNP()"></div>
+          <div class="date-cell"><label>放療結束日</label><input type="date" id="np_radio_end" oninput="buildNP()"></div>
+        </div>
+      </div>
+      <div class="mb-4">
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">條件狀態（讀取自條件評估頁面）</div>
+        <div id="emr_summary" class="space-y-1 text-xs"></div>
+        <div class="mt-1.5 text-xs text-slate-400">如需調整，請切換至「條件評估」頁面修改。</div>
+      </div>
+      <div id="np_status" class="hidden p-3 rounded-lg border text-sm font-semibold mb-3"></div>
+      <div id="np_missing" class="hidden mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800"></div>
+      <div id="np_out" class="cf hidden"></div>
+      <button onclick="copyNP()" id="copyNPBtn" class="btn bn bf mt-3 hidden">複製申請文字</button>
+    </div>
+    <div class="mt-4 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。</div>
+  </div>
+
+  <!-- ══════ TAB 4 藥物對照 ══════ -->
+  <div id="tab4" class="tab-content">
+    <div class="md:hidden flex items-center justify-center text-xs font-bold text-slate-500 bg-slate-100 py-2 px-3 rounded-lg mb-3 no-print">← 左右滑動查看完整對照 →</div>
+    <div class="flex gap-2 mb-3 no-print">
+      <button onclick="window.print()" class="btn bw text-xs hidden md:inline-flex">列印</button>
+      <button onclick="doScreenshot()" class="btn bn text-xs">下載截圖</button>
+    </div>
+
+    <div class="tw" id="capture-area">
+      <div class="ts">
+        <table class="mt">
+          <colgroup><col class="c0"><col class="c1"><col class="c2"></colgroup>
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th class="th-a">
+                <div style="font-size:0.88rem;font-weight:800;color:#0f172a;letter-spacing:-0.01em;">捷癌寧 Verzenio®</div>
+                <div style="font-size:0.75rem;font-weight:400;color:#3b5fc0;margin-top:2px;">Abemaciclib · CDK4/6i · 150mg BID · 2 年</div>
+                <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">
+                  <span style="display:inline-block;padding:2px 7px;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;border-radius:3px;font-size:0.68rem;font-weight:700;">台灣適應症</span>
+                  <span style="display:inline-block;padding:2px 7px;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;border-radius:3px;font-size:0.68rem;font-weight:700;">健保給付</span>
                 </div>
-                <label class="check-row"><input type="checkbox" id="adj_ki67" onchange="runCalc()"> <span class="check-text">手術病理 Ki-67 &ge; 20% <span class="check-subtext text-amber-600 font-bold">自費條件</span></span></label>
-            </div>
-        </div>
+              </th>
+              <th class="th-r">
+                <div style="font-size:0.88rem;font-weight:800;color:#0f172a;letter-spacing:-0.01em;">擊癌利 Kisqali®</div>
+                <div style="font-size:0.75rem;font-weight:400;color:#64748b;margin-top:2px;">Ribociclib · CDK4/6i · 400mg QD · 3 年</div>
+                <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">
+                  <span style="display:inline-block;padding:2px 7px;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;border-radius:3px;font-size:0.68rem;font-weight:700;">台灣無早期適應症</span>
+                  <span style="display:inline-block;padding:2px 7px;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;border-radius:3px;font-size:0.68rem;font-weight:700;">無健保給付</span>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>搭配內分泌治療</td>
+              <td>
+                AI（芳香環轉化酶抑制劑）<br>
+                <span style="font-weight:600;">Tamoxifen ✓</span>（停經前後皆可）<br>
+                <span style="font-size:0.75rem;color:#94a3b8;">MonarchE 納入 AI 及 Tamoxifen</span>
+              </td>
+              <td>
+                NSAI（非類固醇 AI）<br>
+                <span style="color:#b91c1c;font-weight:600;">Tamoxifen ❌ — <em>Not indicated</em>（延長 QTc）</span>
+              </td>
+            </tr>
+            <tr>
+              <td>臨床試驗</td>
+              <td><span style="font-weight:700;">MonarchE</span><br><span style="font-size:0.75rem;color:#94a3b8;">多國多中心 RCT，N=5,637</span></td>
+              <td><span style="font-weight:700;">NATALEE</span><br><span style="font-size:0.75rem;color:#94a3b8;">多國多中心 RCT，N=5,101</span></td>
+            </tr>
+            <tr>
+              <td>試驗族群</td>
+              <td><ul class="dl"><li>ALN ≥ 4 顆，或</li><li>ALN 1–3 ＋ 腫瘤 ≥5cm / Grade 3 / Ki-67 ≥20%</li></ul></td>
+              <td><ul class="dl"><li>Stage IIB–III</li><li>Stage IIA + N1 / Grade 3</li><li>Stage IIA + N0 + Ki-67 ≥20% / 基因高風險</li></ul></td>
+            </tr>
+            <tr>
+              <td>國際指引</td>
+              <td>
+                NCCN Category 1<br>ESMO Evidence A<br>ASCO Strong
+              </td>
+              <td>
+                NCCN Category 1<br>ESMO Evidence A<br>
+                <span style="color:#92400e;">ASCO Conditional</span>
+              </td>
+            </tr>
+            <tr>
+              <td>OS</td>
+              <td>
+                <span style="display:inline-block;padding:2px 7px;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;border-radius:3px;font-size:0.7rem;font-weight:700;margin-bottom:4px;">達統計顯著獲益</span><br>
+                <span style="font-weight:700;">HR 0.842</span> <span style="color:#94a3b8;">(0.722–0.981)</span><br>
+                <span style="font-size:0.75rem;color:#94a3b8;">P = 0.0273 · 7 年追蹤</span>
+              </td>
+              <td>
+                <span style="display:inline-block;padding:2px 7px;background:#fefce8;color:#854d0e;border:1px solid #fde68a;border-radius:3px;font-size:0.7rem;font-weight:700;margin-bottom:4px;">未成熟，無法正式檢定</span><br>
+                <span style="font-weight:700;">HR 0.800</span> <span style="color:#94a3b8;">(0.637–1.003)</span><br>
+                <span style="font-size:0.75rem;color:#94a3b8;">P = 0.026 (one-sided, informational)</span>
+              </td>
+            </tr>
+            <tr>
+              <td>iDFS</td>
+              <td>
+                <span style="font-weight:700;">HR 0.734</span> <span style="color:#94a3b8;">(0.657–0.820)</span><br>
+                <span style="font-size:0.75rem;color:#94a3b8;">P &lt; 0.0001 · 停藥後 5 年仍持續獲益</span><br>
+                <span style="display:inline-block;margin-top:3px;padding:2px 7px;background:#faf5ff;color:#6b21a8;border:1px solid #e9d5ff;border-radius:3px;font-size:0.7rem;font-weight:700;">7 年絕對獲益 6.5%</span>
+              </td>
+              <td>
+                <span style="font-weight:700;">HR 0.716</span> <span style="color:#94a3b8;">(0.618–0.829)</span><br>
+                <span style="font-size:0.75rem;color:#94a3b8;">P &lt; 0.0001 · 停藥後 2 年數據</span><br>
+                <span style="display:inline-block;margin-top:3px;padding:2px 7px;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:3px;font-size:0.7rem;font-weight:700;">5 年絕對獲益 4.3%</span>
+              </td>
+            </tr>
+            <tr>
+              <td>DRFS</td>
+              <td>
+                <span style="font-weight:700;">HR 0.746</span> <span style="color:#94a3b8;">(0.662–0.840)</span><br>
+                <span style="font-size:0.75rem;color:#94a3b8;">P &lt; 0.0001</span><br>
+                <span style="display:inline-block;margin-top:3px;padding:2px 7px;background:#faf5ff;color:#6b21a8;border:1px solid #e9d5ff;border-radius:3px;font-size:0.7rem;font-weight:700;">7 年絕對獲益 5.1%</span>
+              </td>
+              <td>
+                <span style="font-weight:700;">HR 0.699</span> <span style="color:#94a3b8;">(0.594–0.824)</span><br>
+                <span style="font-size:0.75rem;color:#94a3b8;">P &lt; 0.0001</span><br>
+                <span style="display:inline-block;margin-top:3px;padding:2px 7px;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:3px;font-size:0.7rem;font-weight:700;">5 年絕對獲益 4.0%</span>
+              </td>
+            </tr>
+            <tr>
+              <td>追蹤 / 療程</td>
+              <td><span style="font-weight:700;">追蹤 7 年</span>，用藥 2 年</td>
+              <td><span style="font-weight:700;">追蹤 5 年</span>，用藥 3 年</td>
+            </tr>
 
-        <div class="card mb-6">
-            <div class="section-header"><div class="w-2 h-6 bg-slate-400 rounded-full mr-3"></div><h2 class="section-title mb-0">Exclusion (Self-pay only)</h2></div>
-            <label class="check-row"><input type="checkbox" id="exc_male" onchange="runCalc()"> <span class="check-text">男性患者</span></label>
-            <label class="check-row"><input type="checkbox" id="exc_erpr_low" onchange="runCalc()"> <span class="check-text">ER/PR &le; 30%</span></label>
-        </div>
+            <!-- AE collapsible -->
+            <tr class="sh">
+              <td colspan="3" style="padding:0">
+                <button class="acc-btn" id="ae_btn" onclick="toggleTblSec('ae_sec','ae_btn','ae_label')" style="width:100%;padding:11px 13px;">
+                  <span id="ae_label">副作用比較（點擊展開）</span><span class="ch">▼</span>
+                </button>
+              </td>
+            </tr>
+            <tr id="ae_sec" style="display:none">
+              <td colspan="3" style="padding:0">
+                <table class="inner">
+                  <colgroup><col style="width:105px"><col><col></colgroup>
+                  <tr><td>血液毒性</td><td><ul class="dl"><li>嗜中性球減少 84% (G3:18%)</li><li>白血球減少 89% (G3:19%)</li><li>淋巴球減少 59%、貧血 68%</li></ul></td><td><ul class="dl"><li class="rd">嗜中性球減少 94% <span class="font-normal text-slate-500">(G3/4:45%)</span></li><li class="rd">白血球減少 95% <span class="font-normal text-slate-500">(G3/4:27%)</span></li><li>淋巴球減少 97%</li></ul></td></tr>
+                  <tr><td>腸胃道</td><td><ul class="dl"><li class="rd">腹瀉 84% (G3:8%)</li><li>噁心 30%、嘔吐 18%</li></ul></td><td><ul class="dl"><li>腹瀉 15%</li><li>噁心 23%、嘔吐 8%</li></ul></td></tr>
+                  <tr><td>肝功能</td><td><ul class="dl"><li>ALT↑ 37% (G3:2.5%)</li><li>肌酸酐↑ 99%（機轉性）</li></ul></td><td><ul class="dl"><li class="rd">ALT↑ 45% (G3/4:8%)</li><li class="rd">AST↑ 44% (G3/4:5%)</li></ul></td></tr>
+                  <tr><td>特殊</td><td><ul class="dl"><li>ILD 3% (G3/4:0.4%)</li><li>VTE 3%</li></ul></td><td><ul class="dl"><li>ILD 1.5%</li><li class="rd">QTc 延長 — 需定期 ECG</li></ul></td></tr>
+                </table>
+              </td>
+            </tr>
 
-        <div class="text-center text-xs text-slate-400 mt-6 mb-12">
-            最後更新日期：2026年3月18日
-        </div>
+            <!-- Monitoring collapsible -->
+            <tr class="sh">
+              <td colspan="3" style="padding:0">
+                <button class="acc-btn" id="mon_btn" onclick="toggleTblSec('mon_sec','mon_btn','mon_label')" style="width:100%;padding:11px 13px;">
+                  <span id="mon_label">監測建議（點擊展開）</span><span class="ch">▼</span>
+                </button>
+              </td>
+            </tr>
+            <tr id="mon_sec" style="display:none">
+              <td colspan="3" style="padding:0">
+                <table class="inner">
+                  <colgroup><col style="width:105px"><col><col></colgroup>
+                  <tr><td>CBC / LFT</td><td style="color:#475569;font-size:0.8rem">治療前 → 前 2 月每 2 週一次 → 之後 2 個月每月一次 → 之後依臨床需要</td><td style="color:#475569;font-size:0.8rem">治療前 → 前 2 月每 2 週一次 → 之後每 4 週期開始時</td></tr>
+                  <tr><td>ECG / 電解質</td><td style="color:#94a3b8;font-size:0.8rem">不需常規</td><td style="font-size:0.8rem"><span class="rd font-bold">治療前 + D14 第1週期 + 前6週期每週期</span><br><span class="text-xs text-slate-400">監測 QTc 延長（心悸、暈厥）</span></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td>停藥 / 降劑量</td>
+              <td>
+                永久停藥 <span style="font-weight:700;">19%</span>（腹瀉 5%）<br>
+                暫停 <span style="font-weight:700;">62%</span>（腹瀉 20%）<br>
+                降劑量 <span style="font-weight:700;">44%</span>（腹瀉 17%）
+              </td>
+              <td>
+                永久停藥 <span style="font-weight:700;">20%</span>（肝功能 8%）<br>
+                暫停 <span style="font-weight:700;">73%</span>（嗜中性球 43%）<br>
+                降劑量 <span style="font-weight:700;">23%</span>（嗜中性球 14%）
+              </td>
+            </tr>
+
+            <tr>
+              <td>藥物交互作用</td>
+              <td><ul class="dl"><li>避免強效 / 中效 CYP3A 抑制劑</li><li>避免強效 / 中效 CYP3A 誘導劑</li></ul></td>
+              <td>
+                <ul class="dl">
+                  <li>避免強效 CYP3A 抑制劑 / 誘導劑</li>
+                  <li>治療指數狹窄之 CYP3A 受質劑量可能需降低<span style="color:#94a3b8;font-size:0.75rem;">（如 Cyclosporin、Tacrolimus）</span></li>
+                  <li style="color:#b91c1c;font-weight:600;">避免 QT 延長藥物<span style="color:#64748b;font-weight:400;font-size:0.75rem;">（如 amiodarone、azithromycin）</span></li>
+                </ul>
+              </td>
+            </tr>
+
+            <!-- Hepatic collapsible -->
+            <tr class="sh">
+              <td colspan="3" style="padding:0">
+                <button class="acc-btn" id="hep_btn" onclick="toggleTblSec('hep_sec','hep_btn','hep_label')" style="width:100%;padding:11px 13px;">
+                  <span id="hep_label">肝 / 腎功能不全劑量調整（點擊展開）</span><span class="ch">▼</span>
+                </button>
+              </td>
+            </tr>
+            <tr id="hep_sec" style="display:none">
+              <td colspan="3" style="padding:0">
+                <table class="inner">
+                  <colgroup><col style="width:105px"><col><col></colgroup>
+                  <tr>
+                    <td>肝功能不全</td>
+                    <td>
+                      <ul class="dl">
+                        <li><strong>Child-Pugh A / B（輕中度）：</strong>不需調整劑量</li>
+                        <li><strong>Child-Pugh C（重度）：</strong>改為 QD 給藥（每日一次）</li>
+                      </ul>
+                    </td>
+                    <td>
+                      <ul class="dl">
+                        <li>Child-Pugh A（輕度）：不需調整劑量</li>
+                        <li>Child-Pugh B / C（中重度）：降至起始劑量 400mg QD</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>腎功能不全</td>
+                    <td>
+                      <ul class="dl">
+                        <li>輕中度（CLcr ≥ 30–89 mL/min，Cockcroft-Gault）：不需調整劑量</li>
+                        <li>重度（CLcr &lt; 30 mL/min）/ 末期腎病 / 透析：藥動學資料不足，尚無建議劑量</li>
+                      </ul>
+                    </td>
+                    <td>
+                      <ul class="dl">
+                        <li>輕中度（eGFR 30–89 mL/min/1.73m²）：不需調整劑量</li>
+                        <li>重度（eGFR &lt; 30 mL/min/1.73m²）：降至起始劑量 200mg QD</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Price collapsible -->
+            <tr class="sh">
+              <td colspan="3" style="padding:0">
+                <button class="acc-btn" id="pr_btn" onclick="toggleTblSec('pr_sec','pr_btn','pr_label')" style="width:100%;padding:11px 13px;">
+                  <span id="pr_label">自費費用估算（點擊展開）</span><span class="ch">▼</span>
+                </button>
+              </td>
+            </tr>
+            <tr id="pr_sec" style="display:none">
+              <td colspan="3" style="padding:0">
+                <table class="inner">
+                  <colgroup><col style="width:105px"><col><col></colgroup>
+                  <tr><td>療程總費用</td><td style="font-weight:700;">約 168 萬元</td><td style="font-weight:700;">約 70 萬元</td></tr>
+                  <tr><td>療程月數</td><td style="color:#64748b;">24 個月（2 年）</td><td style="color:#64748b;">36 個月（3 年）</td></tr>
+                  <tr><td>每月費用估算</td><td style="font-weight:700;">約 7 萬元／月</td><td style="font-weight:700;">約 2 萬元／月</td></tr>
+                </table>
+                <div style="padding:10px 13px;background:#fefce8;border-top:1px solid #fde68a;font-size:0.75rem;color:#78350f;">
+                  各醫療院所實際定價不同，以上為估算參考值，實際費用請依就醫院所報價為準。
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div id="resultBanner" class="result-floating bg-gray-500">
-        <div class="result-inner">
-            <div id="mainStatus" class="main-status text-white font-bold text-lg mb-1">請勾選條件評估</div>
-            
-            <div id="reasonList" class="hidden"></div>
-            
-            <button id="copyBtn" onclick="generateEMR()" class="hidden action-btn btn-dark">📋 複製健保申請輔助摘要</button>
-            <a id="compareBtn" href="comparison.html" class="hidden action-btn btn-orange">📊 醫護專業版自費對照表</a>
-        </div>
+    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs text-slate-600 mb-3">
+      <strong>重要聲明：</strong>本表格為跨試驗間接比較，各試驗族群、設計及評估方式存在差異，數值不應直接比較。目前尚無 head-to-head RCT。
+    </div>
+    <div class="text-xs text-slate-400 leading-relaxed mb-3">
+      Johnston SRD, et al. <em>Ann Oncol</em>. 2026;37(2):155-165. ｜ Crown J, et al. <em>ESMO Open</em>. 2025;10(11):105858.
+    </div>
+    <div class="mt-2 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。</div>
+  </div><!-- /tab4 -->
+
+  <!-- ══════ TAB 5 共同決策 ══════ -->
+  <div id="tab5" class="tab-content">
+
+    <div class="card">
+      <div class="card-title">共同決策輔助工具</div>
+      <div class="card-sub">以情境式左右比較協助醫師與病人做出個人化選擇</div>
+      <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs text-slate-600">以下為臨床情境分析，非絕對適應症，須綜合病人整體狀況、意願與經濟考量決策。</div>
     </div>
 
-    <script>
-        let currentStatus = "none";
-        function toggleAE(show) { document.getElementById('aeModal').style.display = show ? 'flex' : 'none'; }
-        
-        function runCalc() {
-            let base = ['erpr_gt30', 'her2_neg', 'chemo_used', 'radio_used', 'endo_12w', 'surg_16m'].every(id => document.getElementById(id).checked);
-            
-            let neoRisk = document.getElementById('neo_n1_3').checked && (document.getElementById('neo_g3').checked || document.getElementById('neo_t5_uni').checked || document.getElementById('neo_t5_multi').checked);
-            let adjRisk = document.getElementById('adj_n4').checked || (document.getElementById('adj_n1_3').checked && (document.getElementById('adj_g3').checked || document.getElementById('adj_t5_uni').checked || document.getElementById('adj_t5_multi').checked));
-            
-            let risk = neoRisk || adjRisk;
-            let isKi67 = document.getElementById('neo_ki67').checked || document.getElementById('adj_ki67').checked;
+    <!-- Left-right header -->
+    <div class="grid grid-cols-2 gap-2 mb-1 px-1">
+      <div class="bg-blue-900 text-white rounded-xl px-3 py-2 text-center">
+        <div class="text-xs font-black">Abemaciclib</div>
+        <div class="text-xs opacity-70">BID · 2年 · 健保</div>
+      </div>
+      <div class="bg-slate-600 text-white rounded-xl px-3 py-2 text-center">
+        <div class="text-xs font-black">Ribociclib</div>
+        <div class="text-xs opacity-70">QD · 3年 · 全自費</div>
+      </div>
+    </div>
 
-            let isNHI = base && risk && !document.getElementById('exc_male').checked && !document.getElementById('exc_erpr_low').checked;
-            let isSelf = (!isNHI && (risk || isKi67)) || (risk && (document.getElementById('exc_male').checked || document.getElementById('exc_erpr_low').checked));
+    <!-- Row cards: side-by-side comparison by topic -->
 
-            let banner = document.getElementById('resultBanner');
-            let mainStatus = document.getElementById('mainStatus');
-            let reasonList = document.getElementById('reasonList');
-            let copyBtn = document.getElementById('copyBtn');
-            let compareBtn = document.getElementById('compareBtn');
-            banner.className = 'result-floating';
+    <!-- 適應症/健保 -->
+    <div class="card p-3 mb-2">
+      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">適應症 / 健保</div>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-xs">
+          <div class="font-bold text-blue-900 mb-1">✅ 台灣適應症 + 健保給付</div>
+          <div class="text-slate-600">符合健保條件可零自費。健保申請需完成化療+放療，且手術後 ≤16 個月。</div>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs">
+          <div class="font-bold text-slate-700 mb-1">❌ 台灣無早期乳癌適應症</div>
+          <div class="text-slate-500">全程自費；使用前需充分告知並記錄共同決策。</div>
+        </div>
+      </div>
+    </div>
 
-            if(isNHI) {
-                currentStatus = "nhi"; 
-                mainStatus.innerHTML = "✅ 符合健保給付"; 
-                banner.classList.add('bg-emerald-500'); 
-                reasonList.className = "hidden";
-                copyBtn.innerHTML = "📋 複製健保申請輔助摘要";
-                copyBtn.className = "action-btn btn-dark";
-                compareBtn.className = "hidden";
-            } else if(isSelf) {
-                currentStatus = "self"; 
-                mainStatus.innerHTML = "💡 建議自費使用"; 
-                banner.classList.add('bg-amber-500'); 
-                
-                let missingNHI = [];
-                if (!document.getElementById('erpr_gt30').checked && !document.getElementById('exc_erpr_low').checked) missingNHI.push("未勾選【ER/PR > 30%】");
-                if (!document.getElementById('her2_neg').checked) missingNHI.push("未勾選【HER2 陰性】");
-                if (!document.getElementById('chemo_used').checked) missingNHI.push("未勾選【完成標準化療】");
-                if (!document.getElementById('radio_used').checked) missingNHI.push("未勾選【完成放療】");
-                if (!document.getElementById('endo_12w').checked) missingNHI.push("未勾選【內分泌治療 ≤ 12 周】");
-                if (!document.getElementById('surg_16m').checked) missingNHI.push("未勾選【手術後 ≤ 16 個月】");
-                
-                if (!risk) missingNHI.push("未達標【健保高風險條件】(需淋巴結≥4顆，或1-3顆且併有Grade 3或腫瘤≥5cm)");
-                
-                if (document.getElementById('exc_male').checked) missingNHI.push("排除條件【男性患者】健保不給付");
-                if (document.getElementById('exc_erpr_low').checked) missingNHI.push("排除條件【ER/PR ≤ 30%】健保不給付");
+    <!-- 搭配內分泌治療 -->
+    <div class="card p-3 mb-2">
+      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">搭配內分泌治療</div>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-xs">
+          <div class="font-bold text-blue-900 mb-1">AI 或 Tamoxifen 皆可</div>
+          <div class="text-slate-600">MonarchE 納入兩種；停經前使用 Tamoxifen 者唯一有試驗支持的選擇。</div>
+        </div>
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-xs">
+          <div class="font-bold text-amber-800 mb-1">⚠️ 僅限 NSAI</div>
+          <div class="text-slate-600">FDA 仿單明確：<em>not indicated for concomitant use with tamoxifen</em>。停經前使用 Tamoxifen 者<strong>不可選用</strong>。</div>
+        </div>
+      </div>
+    </div>
 
-                reasonList.innerHTML = `
-                    <div class="text-sm text-amber-50 bg-amber-600/40 p-3 rounded-lg mt-3 mb-3 text-left border border-amber-500/50">
-                        <span class="font-bold block mb-1">⚠️ 無法申請健保原因：</span>
-                        <ul class="list-disc pl-5 opacity-90 text-xs space-y-1">
-                            ${missingNHI.map(item => `<li>${item}</li>`).join('')}
-                        </ul>
-                    </div>`;
-                reasonList.className = "block";
+    <!-- OS 數據 -->
+    <div class="card p-3 mb-2">
+      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">整體存活（OS）</div>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-xs">
+          <div class="font-bold text-blue-900 mb-1">✅ 達統計顯著獲益</div>
+          <div class="text-slate-600">HR 0.842（95% CI 0.722–0.981），P=0.0273，追蹤 7 年</div>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs">
+          <div class="font-bold text-slate-700 mb-1">⚠️ 數據未成熟</div>
+          <div class="text-slate-500">HR 0.800（0.637–1.003），P=0.026（one-sided, informational），追蹤 5 年</div>
+        </div>
+      </div>
+    </div>
 
-                copyBtn.innerHTML = "📋 複製輔助摘要";
-                copyBtn.className = "action-btn btn-dark";
-                compareBtn.className = "action-btn btn-orange";
-            } else {
-                currentStatus = "none"; 
-                mainStatus.innerHTML = "請繼續勾選評估條件"; 
-                banner.classList.add('bg-gray-500'); 
-                reasonList.className = "hidden";
-                copyBtn.className = "hidden";
-                compareBtn.className = "hidden";
-            }
-        }
+    <!-- 主要副作用 -->
+    <div class="card p-3 mb-2">
+      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">主要副作用型態</div>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-xs space-y-1">
+          <div class="font-bold text-blue-900">腹瀉（84%，G3: 8%）</div>
+          <div class="text-slate-600">首次多在第 8 天，正確使用 Loperamide 可管理。<br>降劑量不影響療效（HR 0.905）。</div>
+          <div class="text-slate-600">嗜中性球 G3 首次無需降劑量，G3 復發或 G4 才降階。</div>
+          <div class="text-slate-600">ILD G1/2 無需調整，G3/4 永久停藥。</div>
+          <div class="text-slate-600">VTE 任何等級→暫停，穩定後可恢復。</div>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs space-y-1">
+          <div class="font-bold text-slate-700">嗜中性球低下（94%，G3/4: 45%）</div>
+          <div class="text-slate-600">需頻繁 CBC 監測；嗜中性球 G4 降劑量至 200mg。</div>
+          <div class="font-bold text-slate-700 mt-1">肝毒性（ALT G3/4: 8%）</div>
+          <div class="text-slate-600">高於 Abemaciclib（2.5%）；G4 永久停藥。</div>
+          <div class="font-bold text-slate-700 mt-1">QTc 延長</div>
+          <div class="text-slate-600">需定期 ECG；QTc&gt;500ms 降劑量；再次發生永久停藥。</div>
+        </div>
+      </div>
+    </div>
 
-        function generateEMR() {
-            let emrText = "Patient: [Gender], [Age] y/o　　Diagnosis: [L/R] HR+/HER2− Breast Cancer　Stage: [Stage]　　Application: First-time\n\n";
-            emrText += "All criteria confirmed as follows:\n\n";
+    <!-- 特定病人族群 -->
+    <div class="card p-3 mb-2">
+      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">特定族群考量</div>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-xs space-y-1.5">
+          <div><span class="font-bold text-blue-900">心臟問題 / QTc 風險高</span><br><span class="text-slate-600">不需 ECG 監測，無 QTc 顧慮，更安全</span></div>
+          <div><span class="font-bold text-blue-900">多重用藥（CYP3A 交互作用）</span><br><span class="text-slate-600">強/中效 CYP3A 抑制劑需降劑量；無 QT 延長藥物顧慮，比 Ribociclib 藥物交互作用層面更簡單</span></div>
+          <div><span class="font-bold text-blue-900">肝功能異常風險者</span><br><span class="text-slate-600">ALT G3 發生率較低（2.5% vs 8%）；Child-Pugh C 降頻率為 QD 仍可用</span></div>
+          <div><span class="font-bold text-blue-900">較短療程需求</span><br><span class="text-slate-600">2 年完成，停藥後 5 年仍見持續獲益</span></div>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs space-y-1.5">
+          <div><span class="font-bold text-slate-700">不符健保但符合 NATALEE 族群</span><br><span class="text-slate-500">Stage IIA N0 + Grade 3 / Ki-67 ≥20% 等，NATALEE 有數據</span></div>
+          <div><span class="font-bold text-slate-700">對腹瀉有強烈顧慮</span><br><span class="text-slate-500">腹瀉率 15%（vs 84%）；但須接受嗜中性球低下及 ECG 監測</span></div>
+          <div><span class="font-bold text-slate-700">腎功能不全（重度）</span><br><span class="text-slate-500">Ribociclib 重度腎功能不全起始 200mg；Abemaciclib 重度腎功能不全資料不足</span></div>
+        </div>
+      </div>
+    </div>
 
-            let counter = 1;
+    <!-- 費用 -->
+    <div class="card p-3 mb-2">
+      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">費用估算</div>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-xs">
+          <div class="font-bold text-blue-900 text-base">約 168 萬元</div>
+          <div class="text-slate-600">24 個月，約 7 萬元/月</div>
+          <div class="text-emerald-700 font-bold mt-1">符合條件，可健保給付</div>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs">
+          <div class="font-bold text-slate-700 text-base">約 70 萬元</div>
+          <div class="text-slate-500">36 個月，約 2 萬元/月</div>
+          <div class="text-slate-500 mt-1">全程自費</div>
+        </div>
+      </div>
+      <div class="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2">各醫療院所實際定價不同，以上為估算參考值，實際費用請依就醫院所報價為準。</div>
+    </div>
 
-            if (document.getElementById('erpr_gt30').checked) {
-                emrText += `(${counter++}) HR Positive\nER/PR >____% — exceeds the required >30% threshold.\n\n`;
-            }
-            if (document.getElementById('her2_neg').checked) {
-                emrText += `(${counter++}) HER2 Negative\nHER-2: ____ (negative) confirmed on pathology.\n\n`;
-            }
-            if (document.getElementById('chemo_used').checked) {
-                emrText += `(${counter++}) Chemotherapy Administered\nCompleted full course of ________________________.\n\n`;
-            }
+    <!-- Quick decision flow -->
+    <div class="card p-3 mb-4">
+      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">快速決策流程</div>
+      <div class="space-y-2 text-xs">
+        <div class="flex gap-2">
+          <div class="w-6 h-6 rounded-full bg-blue-900 text-white flex items-center justify-center font-black flex-shrink-0 text-xs">1</div>
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 flex-1"><span class="font-bold text-blue-900">符合健保條件？</span><br>是 → <strong>Abemaciclib（健保）</strong></div>
+        </div>
+        <div class="flex gap-2">
+          <div class="w-6 h-6 rounded-full bg-blue-800 text-white flex items-center justify-center font-black flex-shrink-0 text-xs">2</div>
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 flex-1"><span class="font-bold text-blue-900">使用 Tamoxifen？</span><br>是 → <strong>Abemaciclib（自費）</strong>；Ribociclib <em>not indicated</em></div>
+        </div>
+        <div class="flex gap-2">
+          <div class="w-6 h-6 rounded-full bg-blue-700 text-white flex items-center justify-center font-black flex-shrink-0 text-xs">3</div>
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 flex-1"><span class="font-bold text-blue-900">心臟病 / QTc 風險 / 多種 QT 延長藥物？</span><br>是 → <strong>Abemaciclib（自費）</strong></div>
+        </div>
+        <div class="flex gap-2">
+          <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-black flex-shrink-0 text-xs">4</div>
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 flex-1"><span class="font-bold text-blue-900">肝功能異常風險高 / 多重藥物交互作用顧慮？</span><br>是 → 傾向 <strong>Abemaciclib</strong>（ALT G3 較低）</div>
+        </div>
+        <div class="flex gap-2">
+          <div class="w-6 h-6 rounded-full bg-slate-500 text-white flex items-center justify-center font-black flex-shrink-0 text-xs">5</div>
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 flex-1"><span class="font-bold text-slate-700">腹瀉強烈不耐 + 可接受 ECG 監測？</span><br>考慮 <strong>Ribociclib（自費）</strong>，需告知台灣無適應症</div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-4 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。</div>
 
-            if (document.getElementById('adj_n4').checked) {
-                emrText += `(${counter++}) Pathological Lymph Node Positive: ≥4 Nodes\nSurgery pathology (ALND) confirmed ≥4 positive nodes.\n\n`;
-            } else if (document.getElementById('adj_n1_3').checked) {
-                emrText += `(${counter++}) Pathological Lymph Node Positive: 1–3 Nodes\nSurgery pathology confirmed 1–3 positive nodes.\n\n`;
-            } else if (document.getElementById('neo_n1_3').checked) {
-                emrText += `(${counter++}) Pre-Chemotherapy Pathological Lymph Node Positive: 1–3 Nodes\nCNB/FNA confirmed pathological lymph node positivity, 1–3 nodes.\n\n`;
-            }
+  </div><!-- /tab5 -->
 
-            let highRiskStatements = [];
-            
-            if (document.getElementById('neo_g3').checked) highRiskStatements.push("Pre-chemotherapy pathology (CNB/FNA) confirmed Grade 3");
-            if (document.getElementById('neo_t5_uni').checked) highRiskStatements.push("Pre-chemotherapy imaging confirmed Tumor ≥5cm (Unifocal)");
-            if (document.getElementById('neo_t5_multi').checked) highRiskStatements.push("Pre-chemotherapy imaging confirmed Tumor ≥5cm (Multifocal/Multicentric)");
-            if (document.getElementById('neo_ki67').checked) highRiskStatements.push("Pre-chemotherapy pathology confirmed Ki-67 ≥20%");
-            
-            if (document.getElementById('adj_g3').checked) highRiskStatements.push("Surgery pathology confirmed Grade 3");
-            if (document.getElementById('adj_t5_uni').checked) highRiskStatements.push("Surgery pathology confirmed Tumor ≥5cm (Unifocal)");
-            if (document.getElementById('adj_t5_multi').checked) highRiskStatements.push("Surgery pathology confirmed Tumor ≥5cm (Multifocal/Multicentric)");
-            if (document.getElementById('adj_ki67').checked) highRiskStatements.push("Surgery pathology confirmed Ki-67 ≥20%");
+</div><!-- /max-w -->
 
-            if (highRiskStatements.length > 0) {
-                emrText += `(${counter++}) High-Risk Tumor Characteristics\n- ${highRiskStatements.join('\n- ')}\n— high-risk criterion satisfied.\n\n`;
-            }
+<script>
+const E=id=>document.getElementById(id);
+const V=id=>E(id)?.checked;
 
-            if (document.getElementById('radio_used').checked) {
-                emrText += `(${counter++}) Standard Radiotherapy Completed\nAdjuvant RT to _______________ — completed ____/____/____.\n\n`;
-            }
-            if (document.getElementById('endo_12w').checked) {
-                emrText += `(${counter++}) Endocrine Therapy Within 12 Weeks\nEndocrine therapy commenced ____/____/____ — within 12 weeks of initiation.\n\n`;
-            }
-            if (document.getElementById('surg_16m').checked) {
-                emrText += `(${counter++}) Within 16 Months of Surgery\nSurgery performed ____/____/____ — within 16 months elapsed at time of application.\n`;
-            }
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  E(id).classList.add('active'); btn.classList.add('active');
+  if(id==='tab3') buildNP();
+}
+function toggleAcc(id,btn){ E(id).classList.toggle('open'); btn.classList.toggle('open'); }
+function toggleTblSec(rowId,btnId,lblId){
+  const row=E(rowId); const btn=E(btnId);
+  const hidden=(row.style.display==='none'||row.style.display==='');
+  row.style.display=hidden?'table-row':'none';
+  btn.classList.toggle('open',hidden);
+  if(lblId){
+    const lbl=E(lblId);
+    const base=lbl.textContent.replace('（點擊展開）','').replace('（點擊收合）','');
+    lbl.textContent=base+(hidden?'（點擊收合）':'（點擊展開）');
+  }
+}
 
-            navigator.clipboard.writeText(emrText).then(() => {
-                let t = document.getElementById('toast');
-                let copyBtn = document.getElementById('copyBtn');
-                let originalText = copyBtn.innerText;
-                
-                t.style.opacity = 1;
-                copyBtn.innerText = "✅ 已複製！可直接貼上";
-                copyBtn.style.backgroundColor = "#10b981"; 
+function runAll(){
+  E('neo_sub').style.display=V('c_neo_n13')?'block':'none';
+  E('adj_sub').style.display=V('c_adj_n13')?'block':'none';
+  const neoR=V('c_neo_n13')&&(V('c_neo_g3')||V('c_neo_t5u')||V('c_neo_t5m'));
+  const adjR=V('c_adj_n4')||(V('c_adj_n13')&&(V('c_adj_g3')||V('c_adj_t5u')||V('c_adj_t5m')));
+  const ki67=V('c_neo_ki67')||V('c_adj_ki67');
+  const risk=neoR||adjR;
+  const base=['c_erpr','c_her2','c_chemo','c_radio','c_endo','c_surg'].every(V);
+  const noExcl=!V('c_exc_male')&&!V('c_exc_erpr');
+  const isNHI=base&&risk&&noExcl;
+  const isSelf=!isNHI&&(risk||ki67);
+  const rb=E('result_block');
+  const anyC=document.querySelectorAll('#tab1 input[type=checkbox]:checked').length>0;
+  const anyD=E('d_surg').value||E('d_endo').value;
+  if(!anyC&&!anyD){rb.classList.add('hidden');return;}
+  rb.classList.remove('hidden');
+  if(isNHI){
+    rb.style.cssText='border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;background:#f0fdf4;border:2px solid #86efac;';
+    E('result_main').style.color='#166534'; E('result_main').textContent='符合健保給付條件';
+    E('result_sub').style.color='#16a34a'; E('result_sub').textContent='所有條件均已符合';
+    E('result_missing').classList.add('hidden');
+  } else if(isSelf){
+    rb.style.cssText='border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;background:#fefce8;border:2px solid #fde68a;';
+    E('result_main').style.color='#92400e'; E('result_main').textContent='建議評估自費使用';
+    E('result_sub').style.color='#a16207'; E('result_sub').textContent='已符合高風險或 Ki-67 條件，但不符健保資格';
+    const mis=[];
+    if(!V('c_erpr')&&!V('c_exc_erpr'))mis.push('未勾選【ER/PR > 30%】');
+    if(!V('c_her2'))mis.push('未勾選【HER2 陰性】');
+    if(!V('c_chemo'))mis.push('未勾選【完成化療】');
+    if(!V('c_radio'))mis.push('未勾選【完成放療】');
+    if(!V('c_endo'))mis.push('未勾選【內分泌治療 ≤ 12 週】');
+    if(!V('c_surg'))mis.push('未勾選【手術後 ≤ 16 個月】');
+    if(!risk)mis.push('未達健保高風險條件（Ki-67 ≥20% 僅為自費條件）');
+    if(V('c_exc_male'))mis.push('排除條件【男性患者】');
+    if(V('c_exc_erpr'))mis.push('排除條件【ER/PR ≤ 30%】');
+    const rm=E('result_missing'); rm.classList.remove('hidden');
+    rm.innerHTML='<div style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:10px;text-align:left;font-size:0.75rem;color:#78350f;margin-top:8px"><div style="font-weight:700;margin-bottom:4px">無法申請健保原因：</div><ul style="list-style:disc;padding-left:16px;margin:0">'+mis.map(m=>`<li>${m}</li>`).join('')+'</ul></div>';
+  } else {
+    rb.style.cssText='border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;background:#f1f5f9;border:1px solid #e2e8f0;';
+    E('result_main').style.color='#64748b'; E('result_main').textContent='請繼續勾選評估條件';
+    E('result_sub').style.color='#94a3b8'; E('result_sub').textContent='';
+    E('result_missing').classList.add('hidden');
+  }
+}
 
-                setTimeout(() => { 
-                    t.style.opacity = 0; 
-                    copyBtn.innerText = originalText;
-                    copyBtn.style.backgroundColor = "#1e293b"; 
-                }, 2500);
-            }).catch(err => {
-                alert("複製失敗，請檢查瀏覽器權限設定。");
-            });
-        }
+function calcDates(){
+  const sv=E('d_surg').value; const ev=E('d_endo').value; const today=new Date();
+  if(sv){
+    const s=new Date(sv); const d=Math.floor((today-s)/86400000);
+    const b=E('d_surg_b'); b.classList.remove('hidden');
+    if(d>=0&&d<=480){b.className='dbadge db-ok';b.textContent=`距今 ${d} 天（≤480 ✓）`;E('d_surg').className='v';E('c_surg').checked=true;E('row_surg').classList.add('auto-ok');}
+    else{b.className='dbadge db-bad';b.textContent=d<0?'日期在未來':`距今 ${d} 天（>480 ✗）`;E('d_surg').className='iv';E('c_surg').checked=false;E('row_surg').classList.remove('auto-ok');}
+  }
+  if(sv&&ev){
+    const s=new Date(sv); const e=new Date(ev); const d=Math.floor((e-s)/86400000);
+    const b=E('d_endo_b'); const n=E('d_note'); b.classList.remove('hidden'); n.classList.remove('hidden');
+    if(d>=0&&d<=84){b.className='dbadge db-ok';b.textContent=`距手術 ${d} 天（≤84 ✓）`;E('d_endo').className='v';E('c_endo').checked=true;E('row_endo').classList.add('auto-ok');}
+    else if(d<0){b.className='dbadge db-bad';b.textContent='內分泌日期早於手術日';E('d_endo').className='iv';E('c_endo').checked=false;E('row_endo').classList.remove('auto-ok');}
+    else{b.className='dbadge db-bad';b.textContent=`距手術 ${d} 天（>84 ✗）`;E('d_endo').className='iv';E('c_endo').checked=false;E('row_endo').classList.remove('auto-ok');}
+    n.textContent=`${sv} → ${ev}，相差 ${d>=0?d:'?'} 天`;
+  }
+  runAll();
+}
 
-        function resetForm() { 
-            document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false); 
-            runCalc(); 
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        
-        runCalc();
-    </script>
+function openEvidence(e){ e.preventDefault(); e.stopPropagation(); showToast('證據頁面建置中，敬請期待'); }
+
+function buildNP(){
+  const defs=[
+    {id:'c_erpr',label:'ER/PR > 30%'},
+    {id:'c_her2',label:'HER2 陰性'},
+    {id:'c_chemo',label:'完成標準化療'},
+    {id:'c_radio',label:'完成放療'},
+    {id:'c_endo',label:'內分泌治療 ≤ 12 週'},
+    {id:'c_surg',label:'手術後 ≤ 16 個月'},
+    {id:'c_adj_n4',label:'ALN ≥ 4 顆（手術病理）'},
+    {id:'c_adj_n13',label:'ALN 1–3 顆（手術病理）'},
+    {id:'c_adj_g3',label:'↳ Grade 3（手術）'},
+    {id:'c_adj_t5u',label:'↳ 腫瘤 ≥5cm Unifocal（手術）'},
+    {id:'c_adj_t5m',label:'↳ 腫瘤 ≥5cm Multifocal（手術）'},
+    {id:'c_neo_n13',label:'ALN 1–3 顆（化療前 CNB/FNA）'},
+    {id:'c_neo_g3',label:'↳ Grade 3（化療前）'},
+    {id:'c_neo_t5u',label:'↳ 腫瘤 ≥5cm Unifocal（化療前）'},
+    {id:'c_neo_t5m',label:'↳ 腫瘤 ≥5cm Multifocal（化療前）'},
+    {id:'c_neo_ki67',label:'Ki-67 ≥ 20%（化療前）— 自費條件'},
+    {id:'c_adj_ki67',label:'Ki-67 ≥ 20%（手術病理）— 自費條件'},
+  ];
+  E('emr_summary').innerHTML=defs.map(d=>{
+    const ck=V(d.id);
+    return`<div class="emr-summary-row ${ck?'emr-ok':'emr-na'}"><span>${d.label}</span><span>${ck?'✓ 符合':'—'}</span></div>`;
+  }).join('');
+
+  const pid=E('np_pid').value;
+  // Pull dates from Tab3 inputs first, then fall back to Tab1 auto-calc inputs
+  const surg=E('np_surg').value||E('d_surg').value;
+  const chemo=E('np_chemo_end').value;
+  const radio=E('np_radio_end').value;
+  // Also sync Tab1 surgery date into Tab3 field if Tab3 field is empty
+  if(!E('np_surg').value && E('d_surg').value) E('np_surg').value=E('d_surg').value;
+  const neoR=V('c_neo_n13')&&(V('c_neo_g3')||V('c_neo_t5u')||V('c_neo_t5m'));
+  const adjR=V('c_adj_n4')||(V('c_adj_n13')&&(V('c_adj_g3')||V('c_adj_t5u')||V('c_adj_t5m')));
+  const risk=neoR||adjR;
+  const base=['c_erpr','c_her2','c_chemo','c_radio','c_endo','c_surg'].every(V);
+  const ok=base&&risk;
+  const stEl=E('np_status'); const outEl=E('np_out'); const cpBtn=E('copyNPBtn'); const misEl=E('np_missing');
+  stEl.classList.remove('hidden');
+  if(ok){
+    stEl.innerHTML='全部條件符合 — 可產生申請文字';
+    stEl.className='p-3 rounded-lg border text-sm font-semibold bg-emerald-50 border-emerald-300 text-emerald-800 mb-3';
+    misEl.classList.add('hidden');
+    let c=1,t='';
+    t+=`Patient: ${pid||'[病歷號/姓名]'}\nDiagnosis: HR+/HER2− Early Breast Cancer   Stage: [填寫]\n`;
+    t+=`Application: Abemaciclib (Verzenio®) — First-time\n`;
+    t+=`Surgery: ${surg||'[填寫]'}   Chemo end: ${chemo||'[填寫]'}   RT end: ${radio||'[填寫]'}\n\n`;
+    t+=`All NHI criteria confirmed:\n\n`;
+    if(V('c_erpr'))t+=`(${c++}) HR Positive — ER/PR >30%: ____% confirmed on pathology.\n\n`;
+    if(V('c_her2'))t+=`(${c++}) HER2 Negative — IHC 0/1+, or IHC 2+ with negative ISH.\n\n`;
+    if(V('c_chemo'))t+=`(${c++}) Chemotherapy Completed — ________________________ (last dose: ${chemo||'____/____/____'}).\n\n`;
+    if(V('c_adj_n4'))t+=`(${c++}) Pathological ALN ≥4 Positive Nodes — surgery pathology (ALND) confirmed.\n\n`;
+    else if(V('c_adj_n13')){t+=`(${c++}) Pathological ALN 1–3 Positive Nodes — surgery pathology confirmed.\n`;if(V('c_adj_g3'))t+=`     + Grade 3 (surgical specimen)\n`;if(V('c_adj_t5u'))t+=`     + Tumor ≥5cm (surgical specimen, unifocal)\n`;if(V('c_adj_t5m'))t+=`     + Tumor ≥5cm (surgical specimen, multifocal)\n`;t+='\n';}
+    else if(V('c_neo_n13')){t+=`(${c++}) Pre-Chemo ALN 1–3 Positive Nodes (CNB/FNA confirmed).\n`;if(V('c_neo_g3'))t+=`     + Grade 3 (pre-chemo CNB)\n`;if(V('c_neo_t5u'))t+=`     + Tumor ≥5cm (pre-chemo imaging, unifocal)\n`;if(V('c_neo_t5m'))t+=`     + Tumor ≥5cm (pre-chemo imaging, multifocal)\n`;t+='\n';}
+    if(V('c_radio'))t+=`(${c++}) Radiotherapy Completed — Adjuvant RT completed ${radio||'____/____/____'}.\n\n`;
+    if(V('c_endo'))t+=`(${c++}) Endocrine Therapy ≤12 Weeks — initiated within 12 weeks.\n\n`;
+    if(V('c_surg'))t+=`(${c++}) Within 16 Months of Surgery — surgery: ${surg||'____/____/____'}.\n`;
+    outEl.textContent=t; outEl.classList.remove('hidden'); cpBtn.classList.remove('hidden');
+  } else {
+    const bc=['c_erpr','c_her2','c_chemo','c_radio','c_endo','c_surg'].filter(V).length;
+    stEl.className='p-3 rounded-lg border text-sm font-semibold bg-amber-50 border-amber-300 text-amber-800 mb-3';
+    stEl.innerHTML=`進度：基礎條件 ${bc}/6 ｜ 高風險條件：${risk?'符合':'未符合'}`;
+    outEl.classList.add('hidden'); cpBtn.classList.add('hidden');
+    const mis=['c_erpr','c_her2','c_chemo','c_radio','c_endo','c_surg'].filter(id=>!V(id));
+    const labels={'c_erpr':'ER/PR > 30%','c_her2':'HER2 陰性','c_chemo':'化療完成','c_radio':'放療完成','c_endo':'內分泌 ≤ 12 週','c_surg':'手術後 ≤ 16 個月'};
+    let html='<div style="font-weight:700;margin-bottom:4px">尚未確認的條件：</div>';
+    mis.forEach(id=>{ html+=`<div>❌ ${labels[id]||id}</div>`; });
+    if(!risk) html+='<div>❌ 高風險條件（任一路徑）</div>';
+    misEl.innerHTML=html; misEl.classList.remove('hidden');
+  }
+}
+
+function copyNP(){
+  navigator.clipboard.writeText(E('np_out').textContent).then(()=>{
+    const btn=E('copyNPBtn'); const orig=btn.innerHTML;
+    btn.innerHTML='已複製！貼入 PDF 即可送出'; btn.style.background='#059669';
+    showToast('已複製申請文字');
+    setTimeout(()=>{btn.innerHTML=orig;btn.style.background='';},2500);
+  }).catch(()=>alert('複製失敗，請手動選取文字'));
+}
+
+function downloadHandout(){
+  const btn=event.currentTarget; const orig=btn.innerHTML;
+  btn.innerHTML='截圖產生中...'; btn.disabled=true;
+  html2canvas(E('handout-area'),{scale:2.5,useCORS:true,backgroundColor:'#ffffff'}).then(c=>{
+    const a=document.createElement('a'); a.download='Verzenio_病人衛教單張.png';
+    a.href=c.toDataURL('image/png'); a.click(); btn.innerHTML=orig; btn.disabled=false;
+  }).catch(()=>{alert('截圖失敗');btn.innerHTML=orig;btn.disabled=false;});
+}
+
+function doScreenshot(){
+  const t=E('capture-area');
+  const ss=t.querySelectorAll('th,td');
+  ss.forEach(e=>{if(getComputedStyle(e).position==='sticky'){e.dataset.s='1';e.style.position='static';}});
+  html2canvas(t,{scale:2,useCORS:true,backgroundColor:'#ffffff'}).then(c=>{
+    const a=document.createElement('a'); a.download='ER_HER2_藥物對照.png';
+    a.href=c.toDataURL('image/png'); a.click();
+    ss.forEach(e=>{if(e.dataset.s){e.style.position='';delete e.dataset.s;}});
+  });
+}
+
+function showToast(msg){
+  const t=E('toast'); t.textContent=msg; t.style.opacity=1;
+  setTimeout(()=>t.style.opacity=0,2500);
+}
+</script>
 </body>
 </html>
