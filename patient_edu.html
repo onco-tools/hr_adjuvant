@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>捷癌寧 Verzenio® 用藥衛教指引</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0c2340;--navy2:#1a3a5c;
+  --blue:#2563eb;--sky:#e0f2fe;
+  --green:#16a34a;--green-bg:#f0fdf4;
+  --amber:#92400e;--amber-bg:#fffbeb;
+  --red:#b91c1c;--red-bg:#fff1f2;
+  --purple:#6d28d9;--purple-bg:#f5f3ff;
+  --slate:#475569;--muted:#94a3b8;
+  --border:#e2e8f0;--bg:#f1f5f9;--white:#fff;--r:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);color:#1e293b;-webkit-font-smoothing:antialiased;min-height:100vh;}
+
+.hero{background:linear-gradient(140deg,var(--navy) 0%,#1e3a6e 55%,#0e4d8c 100%);padding:28px 20px 36px;position:relative;overflow:hidden;}
+.hero::after{content:'';position:absolute;right:-40px;bottom:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(59,130,246,0.22) 0%,transparent 70%);pointer-events:none;}
+.hero-pill{display:inline-flex;align-items:center;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.88);font-size:0.7rem;font-weight:700;padding:4px 12px;border-radius:99px;border:1px solid rgba(255,255,255,0.18);margin-bottom:12px;letter-spacing:0.04em;}
+.hero-title{color:white;font-size:1.75rem;font-weight:900;line-height:1.18;letter-spacing:-0.02em;margin-bottom:6px;}
+.hero-title em{color:#93c5fd;font-style:normal;}
+.hero-sub{color:rgba(255,255,255,0.6);font-size:0.8rem;line-height:1.65;max-width:320px;}
+.hero-badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:16px;}
+.hb{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);color:white;padding:4px 11px;border-radius:99px;font-size:0.73rem;font-weight:700;}
+
+.toc{background:white;border-bottom:1px solid var(--border);padding:0 16px;display:flex;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:0;z-index:50;}
+.toc::-webkit-scrollbar{display:none;}
+.toc-btn{flex-shrink:0;padding:11px 12px;font-size:0.71rem;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;transition:all 0.15s;white-space:nowrap;}
+.toc-btn.active{color:var(--navy);border-bottom-color:var(--navy);}
+
+.content{padding:16px 16px 48px;max-width:480px;margin:0 auto;}
+
+.sec{background:white;border-radius:var(--r);border:1px solid var(--border);box-shadow:0 2px 10px rgba(0,0,0,0.04);margin-bottom:12px;overflow:hidden;}
+.sec-hdr{display:flex;align-items:center;gap:10px;padding:14px 16px 12px;border-bottom:1px solid #f1f5f9;}
+.sec-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.ic-blue{background:#dbeafe;}.ic-amber{background:#fef3c7;}.ic-green{background:#dcfce7;}
+.ic-red{background:#fee2e2;}.ic-purple{background:#ede9fe;}.ic-slate{background:#f1f5f9;}.ic-teal{background:#ccfbf1;}
+.sec-title{font-size:0.94rem;font-weight:900;color:#0f172a;}
+.sec-sub{font-size:0.72rem;color:var(--muted);margin-top:1px;line-height:1.4;}
+.sec-body{padding:14px 16px;}
+
+.info-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #f8fafc;font-size:0.82rem;color:#334155;line-height:1.6;}
+.info-row:last-child{border-bottom:none;padding-bottom:0;}
+.ir-icon{font-size:1rem;flex-shrink:0;margin-top:1px;width:20px;text-align:center;}
+
+.dose-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.dose-card{background:var(--sky);border:1px solid #bae6fd;border-radius:12px;padding:12px 14px;text-align:center;}
+.dose-time{font-size:0.7rem;font-weight:700;color:#0369a1;margin-bottom:4px;}
+.dose-val{font-size:1.7rem;font-weight:900;color:var(--navy);line-height:1;}
+.dose-unit{font-size:0.7rem;color:var(--slate);margin-top:2px;}
+
+.rule-card{display:flex;align-items:flex-start;gap:9px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:0.8rem;color:#334155;line-height:1.55;margin-bottom:8px;}
+.rule-card:last-child{margin-bottom:0;}
+
+.missed-box{background:var(--amber-bg);border:1.5px solid #fde68a;border-radius:11px;padding:12px 14px;font-size:0.8rem;color:var(--amber);display:flex;gap:9px;align-items:flex-start;margin-top:10px;}
+
+.lop-flow{display:flex;align-items:center;justify-content:space-between;background:var(--green-bg);border:1.5px solid #86efac;border-radius:12px;padding:12px 14px;gap:4px;margin-bottom:10px;}
+.lop-step{text-align:center;flex:1;}
+.lop-num{font-size:1.75rem;font-weight:900;color:var(--navy);line-height:1;}
+.lop-lbl{font-size:0.63rem;color:var(--slate);margin-top:2px;}
+.lop-arrow{color:#86efac;font-size:1.2rem;font-weight:700;flex-shrink:0;}
+.lop-max{background:#fee2e2;border:1px solid #fecaca;border-radius:8px;padding:4px 8px;text-align:center;}
+.lop-max .lop-num{color:var(--red);}
+
+.grade-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;margin-bottom:6px;border:1.5px solid transparent;gap:8px;}
+.g1{background:var(--green-bg);border-color:#bbf7d0;}.g2{background:var(--amber-bg);border-color:#fde68a;}.g3{background:var(--red-bg);border-color:#fecaca;}
+.gbadge{font-size:0.67rem;font-weight:800;padding:2px 8px;border-radius:4px;flex-shrink:0;}
+.gb1{background:#dcfce7;color:#166534;}.gb2{background:#fef9c3;color:#854d0e;}.gb3{background:#fee2e2;color:#991b1b;}
+.grade-desc{font-size:0.78rem;font-weight:600;color:#1e293b;flex:1;}
+.grade-act{font-size:0.74rem;font-weight:700;text-align:right;flex-shrink:0;line-height:1.3;}
+.ga-ok{color:var(--green);}.ga-warn{color:#d97706;}.ga-bad{color:var(--red);}
+
+.diet-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.diet-card{border-radius:12px;padding:12px;}
+.diet-ok{background:var(--green-bg);border:1.5px solid #86efac;}
+.diet-no{background:#fff8f8;border:1.5px solid #fecaca;}
+.diet-lbl{font-size:0.71rem;font-weight:800;margin-bottom:8px;}
+.dok{color:#166534;}.dno{color:#b91c1c;}
+.diet-item{display:flex;align-items:center;gap:6px;font-size:0.79rem;color:#334155;margin-bottom:5px;}
+.diet-item:last-child{margin-bottom:0;}
+.di-e{font-size:1rem;width:22px;text-align:center;flex-shrink:0;}
+
+.warn-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.warn-card{background:var(--red-bg);border:1.5px solid #fecaca;border-radius:12px;padding:12px 10px;text-align:center;}
+.warn-emo{font-size:1.5rem;margin-bottom:4px;}
+.warn-txt{font-size:0.78rem;font-weight:700;color:var(--red);line-height:1.3;}
+.warn-sub{font-size:0.67rem;color:#9f1239;margin-top:2px;}
+
+.num-list{counter-reset:nl;list-style:none;padding:0;}
+.num-list li{counter-increment:nl;display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #f8fafc;font-size:0.82rem;color:#334155;line-height:1.6;}
+.num-list li:last-child{border-bottom:none;padding-bottom:0;}
+.num-list li::before{content:counter(nl);display:flex;align-items:center;justify-content:center;width:22px;height:22px;min-width:22px;background:var(--navy);color:white;border-radius:50%;font-size:0.68rem;font-weight:800;flex-shrink:0;margin-top:1px;}
+
+.a-warn{background:var(--amber-bg);border:1px solid #fde68a;border-radius:10px;padding:10px 12px;font-size:0.8rem;color:var(--amber);display:flex;gap:8px;align-items:flex-start;margin-top:8px;}
+.a-red{background:var(--red-bg);border:1.5px solid #fecaca;border-radius:10px;padding:10px 12px;font-size:0.8rem;color:#9f1239;display:flex;gap:8px;align-items:flex-start;margin-top:8px;}
+.a-blue{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 12px;font-size:0.8rem;color:#1e40af;display:flex;gap:8px;align-items:flex-start;margin-top:8px;}
+.a-green{background:var(--green-bg);border:1px solid #86efac;border-radius:10px;padding:10px 12px;font-size:0.8rem;color:#14532d;display:flex;gap:8px;align-items:flex-start;margin-top:8px;}
+
+.storage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.st-card{background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;}
+.st-emo{font-size:1.5rem;margin-bottom:4px;}
+.st-txt{font-size:0.72rem;font-weight:700;color:#334155;line-height:1.3;}
+
+.contra-box{background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1.5px solid #c4b5fd;border-radius:12px;padding:14px;display:flex;gap:12px;margin-bottom:12px;}
+.contra-icon{font-size:1.5rem;flex-shrink:0;margin-top:2px;}
+.contra-text{font-size:0.82rem;color:#4c1d95;line-height:1.65;}
+
+.sos{background:linear-gradient(135deg,var(--navy),#1e3a6e);border-radius:var(--r);padding:18px;margin-bottom:12px;position:relative;overflow:hidden;}
+.sos::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 50%,rgba(239,68,68,0.13) 0%,transparent 60%);}
+.sos-title{color:white;font-size:0.95rem;font-weight:900;margin-bottom:3px;}
+.sos-sub{color:rgba(255,255,255,0.55);font-size:0.74rem;margin-bottom:12px;}
+.sos-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.sos-item{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:10px;text-align:center;}
+.sos-emo{font-size:1.2rem;margin-bottom:3px;}
+.sos-txt{font-size:0.71rem;font-weight:700;color:white;line-height:1.3;}
+
+.footer{text-align:center;padding:16px;font-size:0.69rem;color:var(--muted);line-height:1.7;border-top:1px solid var(--border);background:white;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.sec,.sos{animation:fadeUp 0.3s ease both;}
+.sec:nth-child(1){animation-delay:.04s}.sec:nth-child(2){animation-delay:.08s}.sec:nth-child(3){animation-delay:.12s}
+.sec:nth-child(4){animation-delay:.16s}.sec:nth-child(5){animation-delay:.20s}.sec:nth-child(6){animation-delay:.24s}
+.sec:nth-child(7){animation-delay:.28s}.sec:nth-child(8){animation-delay:.32s}.sec:nth-child(9){animation-delay:.36s}
+.sos{animation-delay:.40s;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-pill">📋 Verzenio® 居家照護指引</div>
+  <div class="hero-title">捷癌寧<em>用藥衛教</em></div>
+  <div class="hero-sub">依據 TFDA 核准仿單（2025-04-11）製作，如有疑問請聯繫護理師或醫師。</div>
+  <div class="hero-badges">
+    <div class="hb">💊 每日兩次</div>
+    <div class="hb">📅 療程 2 年</div>
+    <div class="hb">🏥 早期乳癌輔助治療</div>
+  </div>
+</div>
+
+<div class="toc" id="toc">
+  <button class="toc-btn active" onclick="tocScroll('s1',this)">為何使用</button>
+  <button class="toc-btn" onclick="tocScroll('s2',this)">用藥方式</button>
+  <button class="toc-btn" onclick="tocScroll('s3',this)">腹瀉管理</button>
+  <button class="toc-btn" onclick="tocScroll('s4',this)">飲食</button>
+  <button class="toc-btn" onclick="tocScroll('s5',this)">副作用</button>
+  <button class="toc-btn" onclick="tocScroll('s6',this)">交互作用</button>
+  <button class="toc-btn" onclick="tocScroll('s7',this)">懷孕</button>
+  <button class="toc-btn" onclick="tocScroll('s8',this)">注意事項</button>
+  <button class="toc-btn" onclick="tocScroll('s9',this)">儲存</button>
+</div>
+
+<div class="content">
+
+  <!-- 1 為何使用 -->
+  <div class="sec" id="s1">
+    <div class="sec-hdr">
+      <div class="sec-icon ic-blue">🎯</div>
+      <div><div class="sec-title">為什麼要使用這顆藥？</div><div class="sec-sub">了解這顆藥對您的作用</div></div>
+    </div>
+    <div class="sec-body">
+      <div class="info-row"><div class="ir-icon">💊</div><div>捷癌寧（Abemaciclib，商品名 Verzenio®）是一種<strong>標靶口服藥物</strong>，屬於 CDK4/6 抑制劑，能阻斷癌細胞分裂生長所需的特定蛋白質。</div></div>
+      <div class="info-row"><div class="ir-icon">🩷</div><div>適用於<strong>荷爾蒙受體（HR）陽性、HER2 陰性</strong>、淋巴結陽性的早期乳癌輔助治療，與內分泌療法（芳香環酶抑制劑或 tamoxifen）合併使用。</div></div>
+      <div class="info-row"><div class="ir-icon">📉</div><div>大型研究（MonarchE）顯示，捷癌寧能<strong>顯著降低乳癌復發風險</strong>，長達 7 年的追蹤數據也確認對整體存活率有益。</div></div>
+      <div class="info-row"><div class="ir-icon">⏳</div><div>標準療程為持續服用 <strong>2 年</strong>，或直到疾病復發、出現無法耐受的副作用為止。</div></div>
+      <div class="a-blue"><span>💡</span><span>請遵照醫師指示服藥，<strong>不可隨意增減劑量或自行停藥。</strong>有任何疑慮，請先與醫療團隊討論。</span></div>
+    </div>
+  </div>
+
+  <!-- 2 用藥方式 -->
+  <div class="sec" id="s2">
+    <div class="sec-hdr">
+      <div class="sec-icon ic-amber">⏰</div>
+      <div><div class="sec-title">怎麼吃這顆藥？</div><div class="sec-sub">每天固定時間，可隨餐或空腹服用</div></div>
+    </div>
+    <div class="sec-body">
+      <div class="dose-row">
+        <div class="dose-card"><div class="dose-time">🌅 早上</div><div class="dose-val">1</div><div class="dose-unit">顆（150mg）</div></div>
+        <div class="dose-card"><div class="dose-time">🌙 晚上</div><div class="dose-val">1</div><div class="dose-unit">顆（150mg）</div></div>
+      </div>
+      <div class="rule-card"><span>⏰</span><div>每天<strong>相同時間</strong>服用，兩次間隔約 <strong>12 小時</strong></div></div>
+      <div class="rule-card"><span>🍚</span><div>可<strong>隨餐或空腹</strong>服用，不影響療效</div></div>
+      <div class="rule-card"><span>🚫</span><div><strong>不可咀嚼、壓碎或切半，整顆吞服。</strong>錠劑破裂或不完整時請勿服用。</div></div>
+      <div class="missed-box">
+        <span>❓</span>
+        <div><strong>忘記服藥，或服藥後嘔吐？</strong><br><span style="font-weight:400;">不需補服。依<strong>原定時間</strong>服用下一次即可，切勿同時服用兩次劑量。可告知醫師或護理師。</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 腹瀉管理 -->
+  <div class="sec" id="s3">
+    <div class="sec-hdr">
+      <div class="sec-icon ic-amber">🚽</div>
+      <div><div class="sec-title">腹瀉怎麼辦？（最常見副作用）</div><div class="sec-sub">約 8 成病人會發生，多在第 1 個月內出現，提早處置是關鍵！</div></div>
+    </div>
+    <div class="sec-body">
+      <div class="a-warn" style="margin-bottom:12px;margin-top:0;"><span>⚡</span><span><strong>大便一開始變稀，馬上服用止瀉藥</strong>，不要等到嚴重才處理。同時大量補充水分。</span></div>
+      <div style="font-size:0.78rem;font-weight:700;color:var(--slate);margin-bottom:8px;">💊 Loperamide（速瀉停）止瀉藥用法</div>
+      <div class="lop-flow">
+        <div class="lop-step"><div class="lop-num">2</div><div class="lop-lbl">第一次腹瀉<br>立刻吃</div></div>
+        <div class="lop-arrow">→</div>
+        <div class="lop-step"><div class="lop-num">1</div><div class="lop-lbl">之後每<br>2 小時吃</div></div>
+        <div class="lop-arrow">→</div>
+        <div class="lop-step lop-max"><div class="lop-num">8</div><div class="lop-lbl">每天<br>上限</div></div>
+      </div>
+      <div style="font-size:0.69rem;color:var(--muted);margin-bottom:12px;text-align:center;">（每顆 2mg；每日最多 8 顆）</div>
+      <div style="font-size:0.78rem;font-weight:700;color:var(--slate);margin-bottom:8px;">依嚴重程度決定是否暫停藥</div>
+      <div class="grade-row g1"><span class="gbadge gb1">Grade 1</span><span class="grade-desc">每天增加 &lt; 4 次</span><span class="grade-act ga-ok">繼續服藥 ✓</span></div>
+      <div class="grade-row g2"><span class="gbadge gb2">Grade 2</span><span class="grade-desc">增加 4–6 次，24hr 未改善</span><span class="grade-act ga-warn">先暫停，<br>聯絡護理師</span></div>
+      <div class="grade-row g3" style="margin-bottom:0;"><span class="gbadge gb3">Grade 3/4</span><span class="grade-desc">增加 ≥ 7 次 / 需住院</span><span class="grade-act ga-bad">立刻停藥<br>回診</span></div>
+    </div>
+  </div>
+
+  <!-- 4 飲食 -->
+  <div class="sec" id="s4">
+    <div class="sec-hdr">
+      <div class="sec-icon ic-green">🥗</div>
+      <div><div class="sec-title">吃什麼比較好？</div><div class="sec-sub">腹瀉期間特別注意飲食，幫助腸道恢復</div></div>
+    </div>
+    <div class="sec-body">
+      <div class="diet-grid">
+        <div class="diet-card diet-ok">
+          <div class="diet-lbl dok">✅ 建議（BRAT）</div>
+          <div class="diet-item"><div class="di-e">🍌</div>香蕉</div>
+          <div class="diet-item"><div class="di-e">🍚</div>白飯 / 稀飯</div>
+          <div class="diet-item"><div class="di-e">🍎</div>蘋果泥</div>
+          <div class="diet-item"><div class="di-e">🍞</div>白吐司</div>
+          <div class="diet-item"><div class="di-e">💧</div>大量補水</div>
+        </div>
+        <div class="diet-card diet-no">
+          <div class="diet-lbl dno">❌ 請避免</div>
+          <div class="diet-item"><div class="di-e">🌶️</div>辛辣食物</div>
+          <div class="diet-item"><div class="di-e">🥦</div>高纖維食物</div>
+          <div class="diet-item"><div class="di-e">🍟</div>油膩食物</div>
+          <div class="diet-item"><div class="di-e">🥛</div>奶製品</div>
+          <div class="diet-item"><div class="di-e">🍊</div>葡萄柚</div>
+        </div>
+      </div>
+      <div class="a-warn" style="margin-top:10px;"><span>🍊</span><span><strong>葡萄柚（含果汁）請完全禁止</strong>。整個治療期間都不能食用，會大幅增加藥物濃度，使副作用加重。</span></div>
+    </div>
+  </div>
+
+  <!-- 5 副作用 -->
+  <div class="sec" id="s5">
+    <div class="sec-hdr">
+      <div class="sec-icon ic-red">⚠️</div>
+      <div><div class="sec-title">可能有哪些副作用？</div><div class="sec-sub">了解副作用讓您更安心，不代表一定會發生</div></div>
+    </div>
+    <div class="sec-body">
+      <div style="font-size:0.78rem;font-weight:700;color:var(--red);margin-bottom:8px;">🚨 出現以下情況請立刻聯絡醫師 / 回診</div>
+      <div class="warn-grid" style="margin-bottom:12px;">
+        <div class="warn-card"><div class="warn-emo">🌡️</div><div class="warn-txt">發燒 ≥ 38°C</div><div class="warn-sub">可能是嗜中性球低下合併感染</div></div>
+        <div class="warn-card"><div class="warn-emo">😮‍💨</div><div class="warn-txt">呼吸困難<br>咳嗽惡化</div><div class="warn-sub">可能是肺部副作用（ILD）</div></div>
+        <div class="warn-card"><div class="warn-emo">🦵</div><div class="warn-txt">單腳腫脹<br>疼痛</div><div class="warn-sub">可能是靜脈血栓（DVT/PE）</div></div>
+        <div class="warn-card"><div class="warn-emo">💛</div><div class="warn-txt">黃疸、極度<br>倦怠食慾差</div><div class="warn-sub">可能是肝功能異常</div></div>
+      </div>
+      <div class="a-red" style="margin-bottom:14px;"><span>📞</span><span><strong>請勿等到門診，</strong>有上述症狀請立刻撥電話聯絡護理師，或前往急診。</span></div>
+      <div style="font-size:0.78rem;font-weight:700;color:var(--slate);margin-bottom:8px;">⚡ 若持續發生以下狀況，請告知醫師</div>
+      <ul class="num-list">
+        <li>腹瀉（最常見，詳見腹瀉管理說明）</li>
+        <li>噁心、嘔吐、食慾不振、腹痛</li>
+        <li>疲勞、虛弱感</li>
+        <li>頭痛、頭暈</li>
+        <li>脫髮（通常在停藥後可恢復）</li>
+        <li>皮膚紅疹或搔癢</li>
+        <li>血球計數下降——需靠抽血才能發現，故定期回診非常重要</li>
+      </ul>
+      <div class="a-blue" style="margin-top:10px;"><span>💡</span><span>上述副作用不一定會發生，且多數可透過調整劑量或支持性治療改善。<strong>請勿自行停藥，先與醫師討論。</strong></span></div>
+    </div>
+  </div>
+
+  <!-- 6 藥物交互作用 -->
+  <div class="sec" id="s6">
+    <div class="sec-hdr">
+      <div class="sec-icon ic-purple">💬</div>
+      <div><div class="sec-title">可以和其他藥物一起使用嗎？</div><div class="sec-sub">服用任何新藥前，請先告知醫師</div></div>
+    </div>
+    <div class="sec-body">
+      <ul class="num-list">
+        <li>用藥期間，若要服用其他藥品（包括<strong>非處方藥、維他命、健康食品、中草藥、疫苗</strong>），請先諮詢醫師或藥師。</li>
+        <li><strong>葡萄柚及葡萄柚汁</strong>：治療期間請完全禁止，會使捷癌寧濃度大幅升高，增加副作用風險。</li>
+        <li><strong>抗黴菌藥（如 ketoconazole）、部分抗生素（如 clarithromycin）</strong>：可能增加藥物濃度，請告知醫師，可能需調整劑量。</li>
+        <li><strong>抗結核藥（如 rifampin）、部分抗癲癇藥（如 carbamazepine）</strong>：可能降低藥物療效，通常需考慮替代藥物。</li>
+        <li>您正在服用的<strong>芳香環酶抑制劑（如 letrozole、anastrozole）、tamoxifen 或 fulvestrant</strong>，與捷癌寧之間不會互相影響療效。</li>
+      </ul>
+      <div class="a-warn"><span>⚠️</span><span>到診所、醫院或牙科就醫，或接受任何手術前（包括牙科手術），請<strong>主動告知醫師您正在服用捷癌寧。</strong></span></div>
+    </div>
+  </div>
+
+  <!-- 7 懷孕哺乳 -->
+  <div class="sec" id="s7">
+    <div class="sec-hdr">
+      <div class="sec-icon ic-purple">🤰</div>
+      <div><div class="sec-title">懷孕與哺乳注意事項</div><div class="sec-sub">此藥可能對胎兒造成傷害</div></div>
+    </div>
+    <div class="sec-body">
+      <div class="contra-box">
+        <div class="contra-icon">🛡️</div>
+        <div class="contra-text">
+          <strong>有生育能力的女性</strong>，在治療期間及<strong>最後一次服藥後 3 週內</strong>，請使用有效的避孕措施。若懷疑懷孕，請立即告知醫師。
+        </div>
+      </div>
+      <ul class="num-list">
+        <li>若您計劃懷孕、已懷孕或正在哺乳，請務必先告知醫師。</li>
+        <li>動物試驗顯示捷癌寧具有致畸胎性，建議治療期間及停藥後 3 週內避免懷孕。</li>
+        <li><strong>哺乳中的媽媽</strong>：治療期間及最後一次服藥後至少 <strong>3 週內</strong>請停止哺乳（目前不清楚是否分泌至母乳）。</li>
+        <li><strong>男性患者</strong>：動物試驗顯示捷癌寧可能影響生育能力。如有相關顧慮，請與醫師討論。</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 8 注意事項 -->
+  <div class="sec" id="s8">
+    <div class="sec-hdr">
+      <div class="sec-icon ic-teal">📋</div>
+      <div><div class="sec-title">使用期間還有什麼要注意？</div><div class="sec-sub">這些習慣能幫助您安全完成療程</div></div>
+    </div>
+    <div class="sec-body">
+      <ul class="num-list">
+        <li>請依醫師指示<strong>定期回診</strong>，並接受血球計數（CBC）及肝功能（LFT）抽血檢查——開始後前 2 個月每 2 週一次，之後每月一次。定期追蹤才能及時發現副作用並確保療效。</li>
+        <li>如有<strong>發燒或感染症狀</strong>（咽喉痛、頻尿灼熱感等），請立即告知醫師，不要自行服用消炎退燒藥而延誤就醫。</li>
+        <li><strong>手術或牙科手術前</strong>（包括洗牙），請事先告知醫師或牙醫您正在服用捷癌寧。</li>
+        <li>有過去任何疾病史（如<strong>肝臟疾病、肺部疾病、靜脈血栓、高血壓</strong>等），請預先告知醫師。</li>
+        <li>治療期間及停藥後，<strong>未經醫師許可勿自行接種任何疫苗</strong>（包括流感疫苗，請先諮詢）。</li>
+        <li>捷癌寧可能造成<strong>疲倦或頭暈</strong>，操作危險機械或駕駛交通工具時請特別小心。</li>
+        <li>此藥含有<strong>乳糖</strong>。若您有乳糖不耐症或相關遺傳疾病，請告知醫師。</li>
+        <li>請勿將藥品分給他人使用。</li>
+      </ul>
+      <div class="a-green"><span>✅</span><span>定期回診、主動回報任何不適，是完成療程最重要的關鍵。您的醫療團隊一直在支持您。</span></div>
+    </div>
+  </div>
+
+  <!-- 9 儲存 -->
+  <div class="sec" id="s9">
+    <div class="sec-hdr">
+      <div class="sec-icon ic-slate">🏠</div>
+      <div><div class="sec-title">藥品要怎麼儲存？</div><div class="sec-sub">正確保存確保藥效不流失</div></div>
+    </div>
+    <div class="sec-body">
+      <div class="storage-grid" style="margin-bottom:12px;">
+        <div class="st-card"><div class="st-emo">🌡️</div><div class="st-txt">室溫以下<br>（≤ 30°C）</div></div>
+        <div class="st-card"><div class="st-emo">💧</div><div class="st-txt">乾燥避光<br>保存</div></div>
+        <div class="st-card"><div class="st-emo">🚸</div><div class="st-txt">孩童無法<br>輕易取得處</div></div>
+      </div>
+      <div class="info-row"><div class="ir-icon">📦</div><div>連同<strong>藥袋與原包裝</strong>一起保存，保留藥品說明資訊。</div></div>
+      <div class="info-row"><div class="ir-icon">📅</div><div>請注意藥品<strong>有效期限</strong>，過期藥品請依規定丟棄，勿沖入馬桶或洗手台。</div></div>
+      <div class="info-row"><div class="ir-icon">🚫</div><div>破裂或不完整的錠劑請勿服用，請與醫療團隊聯繫。</div></div>
+    </div>
+  </div>
+
+  <!-- SOS -->
+  <div class="sos">
+    <div class="sos-title">⚡ 請立刻聯絡護理師的情況</div>
+    <div class="sos-sub">出現任何一項，不要等到門診</div>
+    <div class="sos-grid">
+      <div class="sos-item"><div class="sos-emo">🌡️</div><div class="sos-txt">發燒 ≥ 38°C</div></div>
+      <div class="sos-item"><div class="sos-emo">🚽</div><div class="sos-txt">腹瀉 ≥ 7 次/天</div></div>
+      <div class="sos-item"><div class="sos-emo">😮‍💨</div><div class="sos-txt">新發呼吸困難</div></div>
+      <div class="sos-item"><div class="sos-emo">🦵</div><div class="sos-txt">單腳腫脹疼痛</div></div>
+      <div class="sos-item"><div class="sos-emo">💛</div><div class="sos-txt">黃疸、極度倦怠</div></div>
+      <div class="sos-item"><div class="sos-emo">😵</div><div class="sos-txt">嚴重頭暈<br>心跳異常</div></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  本衛教資料依據 Verzenio®（Abemaciclib）TFDA 核准仿單（版本日期 2025-04-11）製作，供病人及照護者參考。<br>
+  本衛教單張無法取代醫師或藥師的個別醫療建議，實際用藥疑問請諮詢您的醫療團隊。
+</div>
+
+<script>
+function tocScroll(id, btn){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const offset = document.getElementById('toc').offsetHeight + 8;
+  window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - offset, behavior:'smooth'});
+  document.querySelectorAll('.toc-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+const secs=['s1','s2','s3','s4','s5','s6','s7','s8','s9'];
+const btns=document.querySelectorAll('.toc-btn');
+window.addEventListener('scroll',()=>{
+  const off=document.getElementById('toc').offsetHeight+20;
+  let cur=0;
+  secs.forEach((id,i)=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<=off)cur=i;});
+  btns.forEach((b,i)=>b.classList.toggle('active',i===cur));
+},{passive:true});
+</script>
+</body>
+</html>

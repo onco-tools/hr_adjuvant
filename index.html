@@ -1,20 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-YNKXFDB46Q"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-YNKXFDB46Q');
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ER+/HER2− 早期乳癌輔助工具</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
 :root{--navy:#0c2340;--bg:#f0f4f8;}
@@ -118,6 +112,24 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
 .emr-ok{background:#f0fdf4;color:#166534;font-weight:600;}
 .emr-na{background:#f8fafc;color:#94a3b8;}
 
+/* Sub-tabs inside AE tab */
+.sub-nav{display:flex;gap:3px;background:#f1f5f9;border-radius:10px;padding:4px;margin-bottom:14px;}
+.sub-btn{flex:1;padding:7px 10px;border-radius:7px;border:none;cursor:pointer;font-weight:700;font-size:0.78rem;transition:all 0.15s;background:transparent;color:#64748b;font-family:inherit;}
+.sub-btn.active{background:white;color:#0c2340;box-shadow:0 1px 4px rgba(0,0,0,0.1);}
+.sub-content{display:none;}
+.sub-content.active{display:block;animation:fi 0.15s ease;}
+
+/* Lab input fields for NP */
+.lab-row{display:flex;align-items:center;padding:9px 12px;background:#f8fafc;border-radius:8px;margin-bottom:6px;border:1.5px solid #e2e8f0;gap:10px;}
+.lab-row:has(input:not([value=""])),.lab-row.filled{border-color:#bfdbfe;background:#f0f7ff;}
+.lab-label{font-size:0.78rem;font-weight:600;color:#334155;flex:1;min-width:0;}
+.lab-sub{font-size:0.7rem;color:#94a3b8;display:block;margin-top:1px;}
+.lab-inp{width:100px;flex-shrink:0;border:1.5px solid #e2e8f0;border-radius:6px;padding:5px 8px;font-size:0.82rem;font-family:inherit;outline:none;text-align:right;}
+.lab-inp:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,0.08);}
+.lab-inp.ok{border-color:#10b981;background:#f0fdf4;}
+.lab-inp.fail{border-color:#f87171;background:#fff1f2;}
+.lab-unit{font-size:0.75rem;color:#64748b;flex-shrink:0;}
+
 #toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:8px 20px;border-radius:9999px;font-weight:700;font-size:0.8rem;opacity:0;transition:opacity 0.3s;z-index:9999;pointer-events:none;}
 #result_block{border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;}
 
@@ -131,6 +143,7 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
   th,td{padding:7px!important;font-size:8pt!important}
   @page{size:landscape;margin:10mm}
 }
+
 </style>
 </head>
 <body class="p-4 md:p-6 pb-16">
@@ -147,8 +160,8 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
 
   <div class="tab-nav no-print">
     <button class="tab-btn active" onclick="switchTab('tab1',this)">條件評估</button>
-    <button class="tab-btn" onclick="switchTab('tab2',this)">AE 管理</button>
     <button class="tab-btn" onclick="switchTab('tab3',this)">事審文字</button>
+    <button class="tab-btn" onclick="switchTab('tab2',this)">AE 管理</button>
     <button class="tab-btn" onclick="switchTab('tab4',this)">藥物對照</button>
     <button class="tab-btn" onclick="switchTab('tab5',this)">共同決策</button>
   </div>
@@ -208,7 +221,14 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
   <!-- ══════ TAB 2 AE 管理 ══════ -->
   <div id="tab2" class="tab-content">
 
-    <!-- ── Abema section ── -->
+    <!-- Sub-tab nav -->
+    <div class="sub-nav">
+      <button class="sub-btn active" id="ae_hcp_btn" onclick="switchSubTab('ae_hcp','ae_hcp_btn')">醫護版 AE 管理</button>
+      <button class="sub-btn" id="ae_pt_btn" onclick="switchSubTab('ae_pt','ae_pt_btn')">病人衛教 QR</button>
+    </div>
+
+    <!-- ── HCP sub-tab ── -->
+    <div id="ae_hcp" class="sub-content active">
     <div class="ae-section-hdr">
       <div class="ae-pill ae-pill-a">Abemaciclib</div>
       <span class="text-sm font-bold text-slate-700">AE 管理</span>
@@ -343,37 +363,8 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
     </div>
 
     <!-- Handout -->
-    <div class="card">
-      <div class="card-title">📋 病人衛教單張</div>
-      <div class="card-sub">居家照護說明，可截圖列印交給病人</div>
-      <div id="handout-area" style="border-radius:10px;overflow:hidden;border:1.5px solid #e2e8f0;">
-        <div style="background:#0c2340;color:white;padding:12px 16px;"><div class="text-sm font-black">捷癌寧 (Verzenio®) 居家照護指引</div><div class="text-xs opacity-70 mt-0.5">早期乳癌輔助治療</div></div>
-        <div class="p-4 bg-white space-y-3">
-          <div class="bg-amber-50 border border-amber-200 rounded-lg p-3"><div class="font-bold text-amber-800 text-sm mb-1">⏰ 用藥方式</div><div class="text-sm text-amber-800">每天<strong>早餐後</strong>一顆、<strong>晚餐後</strong>一顆（間隔約 12 小時）</div><div class="text-xs text-amber-600 mt-1">忘記服藥不需補服，下次正常時間繼續</div></div>
-          <div>
-            <div class="font-bold text-sm text-slate-700 mb-1.5">🚽 腹瀉的預防與處理</div>
-            <div class="grid grid-cols-2 gap-2">
-              <div class="bg-emerald-50 rounded-lg p-2.5 border border-emerald-100 text-xs"><div class="font-bold text-emerald-700 mb-1">✅ 建議（BRAT）</div><div class="text-emerald-800">香蕉、白飯<br>蘋果泥、白吐司</div></div>
-              <div class="bg-slate-50 rounded-lg p-2.5 border border-slate-200 text-xs"><div class="font-bold text-slate-700 mb-1">❌ 避免</div><div class="text-slate-600">辛辣、高纖維<br>油膩、奶製品</div></div>
-            </div>
-            <div class="mt-2 bg-blue-50 rounded-lg p-2.5 border border-blue-100 text-xs"><div class="font-bold text-blue-800 mb-0.5">💊 Loperamide 參考</div><div class="text-blue-700">首次 → <strong>2 顆</strong>；每 2hr → <strong>1 顆</strong>；上限 <strong>8 顆/天</strong></div></div>
-          </div>
-          <div>
-            <div class="font-bold text-sm text-slate-700 mb-1.5">⚠️ 出現以下症狀請立即回診</div>
-            <div class="grid grid-cols-2 gap-1.5 text-xs">
-              <div class="bg-red-50 rounded-lg p-2 border border-red-100 text-red-700 font-semibold">🌡️ 發燒 ≥ 38°C</div>
-              <div class="bg-red-50 rounded-lg p-2 border border-red-100 text-red-700 font-semibold">🚽 腹瀉 ≥ 7 次/天</div>
-              <div class="bg-red-50 rounded-lg p-2 border border-red-100 text-red-700 font-semibold">😮‍💨 呼吸困難惡化</div>
-              <div class="bg-red-50 rounded-lg p-2 border border-red-100 text-red-700 font-semibold">🦵 單腳腫脹疼痛</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <button onclick="downloadHandout()" class="btn bn bf mt-3">📥 下載衛教單截圖</button>
-    </div>
-
-    <!-- ── Ribo section ── -->    <div class="ae-section-hdr mt-4">
-      <div class="ae-pill ae-pill-r">Ribociclib</div>
+    <!-- ── Ribo section ── -->
+    <div class="ae-section-hdr mt-4">      <div class="ae-pill ae-pill-r">Ribociclib</div>
       <span class="text-sm font-bold text-slate-700">AE 管理參考</span>
     </div>
 
@@ -448,34 +439,171 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
     </div>
 
     <!-- ── Ribo section ends ── -->
+
+    </div><!-- /ae_hcp -->
+
+    <!-- ── Patient QR sub-tab ── -->
+    <div id="ae_pt" class="sub-content">
+      <div class="card">
+        <div class="card-title">📱 病人衛教 QR Code</div>
+        <div class="card-sub">掃描後即可查看完整居家照護衛教單張</div>
+
+        <!-- QR display — auto generated on tab switch -->
+        <div id="qr_block" class="flex flex-col items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200 mb-4">
+          <div id="qr_canvas"></div>
+          <div class="text-xs text-slate-500 text-center" id="qr_caption">捷癌寧 Verzenio® 居家照護衛教單張</div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="flex flex-col gap-2">
+          <button onclick="openPatientEdu()" class="btn bn bf" style="background:#0c2340;">📖 開啟衛教單張（可列印）</button>
+          <button onclick="downloadQR()" class="btn bw bf">📥 下載 QR Code 圖檔</button>
+        </div>
+
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 12px;font-size:0.78rem;color:#1e40af;margin-top:12px;">
+          💡 可將 QR Code 貼在藥袋、衛教單或診間看板，病人掃描即可查看。
+        </div>
+
+        <div class="mt-4">
+          <label class="text-xs font-bold text-slate-400 block mb-2">自訂連結（選填）— 若有醫院衛教網頁，可取代預設頁面</label>
+          <div class="flex gap-2">
+            <input type="text" id="qr_url" placeholder="https://your-hospital.com/verzenio-edu" oninput="genQR()" class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm font-sans outline-none" style="box-sizing:border-box;">
+            <button onclick="genQR()" class="btn bn text-xs px-4">更新</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /ae_pt -->
+
     <div class="mt-4 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。</div>
 
   </div><!-- /tab2 -->
 
   <!-- ══════ TAB 3 事審文字 ══════ -->
   <div id="tab3" class="tab-content">
+
+    <!-- Document checklist for NP -->
     <div class="card">
-      <div class="card-title">健保事審申請文字產生器</div>
-      <div class="card-sub">條件自動讀取自「條件評估」，補充病人基本資料即可產生申請摘要</div>
-      <div class="mb-4">
-        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">病人基本資料（選填）</div>
-        <div class="date-row">
-          <div class="date-cell"><label>病歷號 / 姓名</label><input type="text" id="np_pid" placeholder="00000000 / 王○○" oninput="buildNP()"></div>
-          <div class="date-cell"><label>手術日期</label><input type="date" id="np_surg" oninput="buildNP()"></div>
-          <div class="date-cell"><label>化療結束日</label><input type="date" id="np_chemo_end" oninput="buildNP()"></div>
-          <div class="date-cell"><label>放療結束日</label><input type="date" id="np_radio_end" oninput="buildNP()"></div>
-        </div>
+      <div class="card-title">文件查找清單</div>
+      <div class="card-sub">在 HIS 系統中依序查找以下資料，輸入數值後自動帶入申請文字</div>
+
+      <!-- Dates -->
+      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">時間資料</div>
+      <div class="date-row">
+        <div class="date-cell"><label>手術日期 <span style="color:#94a3b8;font-weight:400;">（手術紀錄）</span></label><input type="date" id="np_surg" oninput="buildNP()"></div>
+        <div class="date-cell"><label>化療結束日 <span style="color:#94a3b8;font-weight:400;">（化療用藥最後一次）</span></label><input type="date" id="np_chemo_end" oninput="buildNP()"></div>
+        <div class="date-cell"><label>放療結束日 <span style="color:#94a3b8;font-weight:400;">（放射治療紀錄）</span></label><input type="date" id="np_radio_end" oninput="buildNP()"></div>
+        <div class="date-cell"><label>內分泌治療開始日 <span style="color:#94a3b8;font-weight:400;">（用藥紀錄）</span></label><input type="date" id="np_endo_start" oninput="buildNP()"></div>
       </div>
-      <div class="mb-4">
-        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">條件狀態（讀取自條件評估頁面）</div>
-        <div id="emr_summary" class="space-y-1 text-xs"></div>
-        <div class="mt-1.5 text-xs text-slate-400">如需調整，請切換至「條件評估」頁面修改。</div>
+
+      <!-- Key lab values -->
+      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 mt-3">病理數值 <span style="font-weight:400;color:#94a3b8;">（病理報告 → 免疫組化染色）</span></div>
+
+      <div class="lab-row" id="lr_erpr">
+        <div class="lab-label">ER / PR 百分比<span class="lab-sub">病理報告 > 免疫組化 > ER%、PR%</span></div>
+        <input type="number" id="lab_er" class="lab-inp" placeholder="0" min="0" max="100" oninput="labCheck()"> <span class="lab-unit">% ER</span>
+        <input type="number" id="lab_pr" class="lab-inp ml-1" placeholder="0" min="0" max="100" oninput="labCheck()"> <span class="lab-unit">% PR</span>
       </div>
+      <div id="lab_er_h" class="lab-hint lh-info" style="padding-left:12px;margin-bottom:6px;"></div>
+
+      <div class="lab-row" id="lr_her2">
+        <div class="lab-label">HER2 結果<span class="lab-sub">病理報告 > IHC 及 ISH 結果</span></div>
+        <select id="lab_her2" class="lab-inp" onchange="labCheck()" style="width:140px;text-align:left;">
+          <option value="">請選擇</option>
+          <option value="IHC0">IHC 0（陰性）</option>
+          <option value="IHC1">IHC 1+（陰性）</option>
+          <option value="IHC2neg">IHC 2+ / ISH 陰性</option>
+          <option value="IHC2pos">IHC 2+ / ISH 陽性</option>
+          <option value="IHC3">IHC 3+（陽性）</option>
+        </select>
+      </div>
+      <div id="lr_her2_hint" class="lab-hint" style="padding-left:12px;margin-bottom:6px;"></div>
+
+      <div class="lab-row">
+        <div class="lab-label">Ki-67 %<span class="lab-sub">病理報告 > Proliferation index</span></div>
+        <input type="number" id="lab_ki67" class="lab-inp" placeholder="0" min="0" max="100" oninput="labCheck()"> <span class="lab-unit">%</span>
+      </div>
+      <div id="lab_ki67_h" class="lab-hint" style="padding-left:12px;margin-bottom:6px;"></div>
+
+      <div class="lab-row">
+        <div class="lab-label">治療路徑<span class="lab-sub">決定 Adjuvant 或 Neoadjuvant</span></div>
+        <select id="lab_path" class="lab-inp" onchange="labCheck()" style="width:160px;text-align:left;">
+          <option value="">請選擇</option>
+          <option value="adj">Adjuvant（手術後化療）</option>
+          <option value="neo">Neoadjuvant（術前化療）</option>
+        </select>
+      </div>
+
+      <div class="lab-row" id="lr_aln">
+        <div class="lab-label">ALN 陽性數目<span class="lab-sub">手術病理報告 > ALND 淋巴結（不含鎖骨上/內乳）</span></div>
+        <input type="number" id="lab_aln" class="lab-inp" placeholder="0" min="0" oninput="labCheck()"> <span class="lab-unit">顆</span>
+      </div>
+      <div id="lab_aln_h" class="lab-hint" style="padding-left:12px;margin-bottom:6px;"></div>
+
+      <div class="lab-row">
+        <div class="lab-label">腫瘤大小（最大徑）<span class="lab-sub">手術病理報告 > 腫瘤大小</span></div>
+        <input type="number" id="lab_size" class="lab-inp" placeholder="0.0" step="0.1" min="0" oninput="labCheck()"> <span class="lab-unit">cm</span>
+      </div>
+      <div id="lab_size_h" class="lab-hint" style="padding-left:12px;margin-bottom:6px;"></div>
+
+      <div class="lab-row">
+        <div class="lab-label">腫瘤形態<span class="lab-sub">病理報告 > 病灶數量</span></div>
+        <select id="lab_focal" class="lab-inp" onchange="labCheck()" style="width:160px;text-align:left;">
+          <option value="uni">Unifocal（單一病灶）</option>
+          <option value="multi">Multifocal / Multicentric</option>
+        </select>
+      </div>
+
+      <div class="lab-row">
+        <div class="lab-label">組織分級（Grade）<span class="lab-sub">病理報告 > Histologic Grade</span></div>
+        <select id="lab_grade" class="lab-inp" onchange="labCheck()" style="width:100px;text-align:left;">
+          <option value="">請選擇</option>
+          <option value="1">Grade 1</option>
+          <option value="2">Grade 2</option>
+          <option value="3">Grade 3</option>
+        </select>
+      </div>
+      <div id="lab_grade_h" class="lab-hint" style="padding-left:12px;margin-bottom:6px;"></div>
+
+      <div class="lab-row">
+        <div class="lab-label">化療方案<span class="lab-sub">用藥紀錄 > 化療藥物名稱</span></div>
+        <input type="text" id="lab_chemo_reg" class="lab-inp" placeholder="e.g. AC-T" style="width:150px;text-align:left;" oninput="buildNP()">
+      </div>
+
+      <div class="lab-row">
+        <div class="lab-label">放療部位<span class="lab-sub">放射治療紀錄 > 照射部位</span></div>
+        <input type="text" id="lab_rt_site" class="lab-inp" placeholder="e.g. 左側胸壁" style="width:150px;text-align:left;" oninput="buildNP()">
+      </div>
+
+      <div class="lab-row">
+        <div class="lab-label">內分泌治療藥物<span class="lab-sub">用藥紀錄 > 目前使用</span></div>
+        <input type="text" id="lab_et" class="lab-inp" placeholder="e.g. Letrozole" style="width:150px;text-align:left;" oninput="buildNP()">
+      </div>
+
+      <!-- Patient ID -->
+      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 mt-3">病人識別</div>
+      <div class="lab-row">
+        <div class="lab-label">病歷號 / 姓名</div>
+        <input type="text" id="np_pid" class="lab-inp" placeholder="00000000 / 王○○" style="width:180px;text-align:left;" oninput="buildNP()">
+      </div>
+    </div>
+
+    <!-- Condition status read-through -->
+    <div class="card">
+      <div class="card-title">條件確認狀態</div>
+      <div class="card-sub">依據「條件評估」頁面的勾選狀態自動顯示，如需調整請切換至條件評估頁面</div>
+      <div id="emr_summary" class="space-y-1 text-xs"></div>
+    </div>
+
+    <!-- Output -->
+    <div class="card">
+      <div class="card-title">健保事審申請文字</div>
+      <div class="card-sub">確認所有條件與數值後，複製至 PDF 送出</div>
       <div id="np_status" class="hidden p-3 rounded-lg border text-sm font-semibold mb-3"></div>
       <div id="np_missing" class="hidden mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800"></div>
       <div id="np_out" class="cf hidden"></div>
       <button onclick="copyNP()" id="copyNPBtn" class="btn bn bf mt-3 hidden">複製申請文字</button>
     </div>
+
     <div class="mt-4 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。</div>
   </div>
 
@@ -904,6 +1032,18 @@ function switchTab(id,btn){
   E(id).classList.add('active'); btn.classList.add('active');
   if(id==='tab3') buildNP();
 }
+function switchSubTab(id,btnId){
+  document.querySelectorAll('.sub-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sub-btn').forEach(b=>b.classList.remove('active'));
+  E(id).classList.add('active'); E(btnId).classList.add('active');
+  if(id==='ae_pt') initPatientQR();
+}
+function initPatientQR(){
+  const c=E('qr_canvas'); if(!c||c.innerHTML!=='') return;
+  const defaultUrl=window.location.href.replace(/[^/]*$/,'verzenio_patient.html');
+  const urlInput=E('qr_url'); if(urlInput&&!urlInput.value) urlInput.value=defaultUrl;
+  _renderQR(defaultUrl,'捷癌寧居家照護衛教單張');
+}
 function toggleAcc(id,btn){ E(id).classList.toggle('open'); btn.classList.toggle('open'); }
 function toggleTblSec(rowId,btnId,lblId){
   const row=E(rowId); const btn=E(btnId);
@@ -983,6 +1123,30 @@ function calcDates(){
 
 function openEvidence(e){ e.preventDefault(); e.stopPropagation(); showToast('證據頁面建置中，敬請期待'); }
 
+function labCheck(){
+  // ER/PR
+  const er=parseInt(E('lab_er').value)||0; const pr=parseInt(E('lab_pr').value)||0;
+  const erprOk=er>30||pr>30;
+  if(E('lab_er').value||E('lab_pr').value){
+    E('lab_er').className='lab-inp'+(er>30?' ok':' fail');
+    E('lab_pr').className='lab-inp ml-1'+(pr>30?' ok':' fail');
+    const hint=E('lr_erpr_hint');
+    hint.classList.remove('hidden');
+    hint.style.color=erprOk?'#166534':'#b91c1c';
+    hint.textContent=erprOk?`✓ ER ${er}% / PR ${pr}%，符合 >30% 條件`:`✗ ER ${er}% / PR ${pr}%，未達 >30% 條件`;
+  }
+  // HER2
+  const her2=E('lab_her2').value;
+  if(her2){
+    const her2Ok=her2==='IHC0'||her2==='IHC1'||her2==='IHC2neg';
+    const hint=E('lr_her2_hint');
+    hint.classList.remove('hidden');
+    hint.style.color=her2Ok?'#166534':'#b91c1c';
+    hint.textContent=her2Ok?'✓ HER2 陰性，符合條件':'✗ HER2 陽性，不符合給付條件';
+  }
+  buildNP();
+}
+
 function buildNP(){
   const defs=[
     {id:'c_erpr',label:'ER/PR > 30%'},
@@ -1003,43 +1167,77 @@ function buildNP(){
     {id:'c_neo_ki67',label:'Ki-67 ≥ 20%（化療前）— 自費條件'},
     {id:'c_adj_ki67',label:'Ki-67 ≥ 20%（手術病理）— 自費條件'},
   ];
-  E('emr_summary').innerHTML=defs.map(d=>{
+  const sumEl=E('emr_summary');
+  if(sumEl) sumEl.innerHTML=defs.map(d=>{
     const ck=V(d.id);
     return`<div class="emr-summary-row ${ck?'emr-ok':'emr-na'}"><span>${d.label}</span><span>${ck?'✓ 符合':'—'}</span></div>`;
   }).join('');
 
-  const pid=E('np_pid').value;
-  // Pull dates from Tab3 inputs first, then fall back to Tab1 auto-calc inputs
-  const surg=E('np_surg').value||E('d_surg').value;
-  const chemo=E('np_chemo_end').value;
-  const radio=E('np_radio_end').value;
-  // Also sync Tab1 surgery date into Tab3 field if Tab3 field is empty
-  if(!E('np_surg').value && E('d_surg').value) E('np_surg').value=E('d_surg').value;
+  // Read lab values
+  const er=E('lab_er')?.value; const pr=E('lab_pr')?.value;
+  const her2=E('lab_her2')?.value; const aln=E('lab_aln')?.value;
+  const grade=E('lab_grade')?.value; const size=E('lab_size')?.value;
+  const reg=E('lab_chemo_reg')?.value; const rtSite=E('lab_rt_site')?.value;
+  const et=E('lab_et')?.value;
+  const pid=E('np_pid')?.value||'';
+  const surg=E('np_surg')?.value||E('d_surg')?.value||'';
+  const chemo=E('np_chemo_end')?.value||'';
+  const radio=E('np_radio_end')?.value||'';
+  const endoStart=E('np_endo_start')?.value||'';
+
+  // Sync tab1 dates
+  if(!E('np_surg')?.value && E('d_surg')?.value) { const f=E('np_surg'); if(f) f.value=E('d_surg').value; }
+
+  // Build ER/PR string
+  const erprStr=(er&&pr)?`ER ${er}%, PR ${pr}%`:(er?`ER ${er}%`:(pr?`PR ${pr}%`:'____'));
+  // Build HER2 string
+  const her2Map={'IHC0':'IHC 0 (negative)','IHC1':'IHC 1+ (negative)','IHC2neg':'IHC 2+ / ISH negative','IHC2pos':'IHC 2+ / ISH positive (HER2+)','IHC3':'IHC 3+ (HER2+)'};
+  const her2Str=her2?her2Map[her2]:'____';
+  // ALN string
+  const alnStr=aln?`${aln} 顆（ALND 病理報告）`:'____';
+  // Grade string
+  const gradeStr=grade?`Grade ${grade}`:'____';
+  // Size string
+  const sizeStr=size?`${size} cm`:'____';
+
   const neoR=V('c_neo_n13')&&(V('c_neo_g3')||V('c_neo_t5u')||V('c_neo_t5m'));
   const adjR=V('c_adj_n4')||(V('c_adj_n13')&&(V('c_adj_g3')||V('c_adj_t5u')||V('c_adj_t5m')));
   const risk=neoR||adjR;
   const base=['c_erpr','c_her2','c_chemo','c_radio','c_endo','c_surg'].every(V);
   const ok=base&&risk;
   const stEl=E('np_status'); const outEl=E('np_out'); const cpBtn=E('copyNPBtn'); const misEl=E('np_missing');
+  if(!stEl) return;
   stEl.classList.remove('hidden');
   if(ok){
     stEl.innerHTML='全部條件符合 — 可產生申請文字';
     stEl.className='p-3 rounded-lg border text-sm font-semibold bg-emerald-50 border-emerald-300 text-emerald-800 mb-3';
     misEl.classList.add('hidden');
     let c=1,t='';
-    t+=`Patient: ${pid||'[病歷號/姓名]'}\nDiagnosis: HR+/HER2− Early Breast Cancer   Stage: [填寫]\n`;
+    t+=`Patient: ${pid||'[病歷號/姓名]'}\n`;
+    t+=`Diagnosis: HR+/HER2− Early Breast Cancer   Stage: [填寫]\n`;
     t+=`Application: Abemaciclib (Verzenio®) — First-time\n`;
     t+=`Surgery: ${surg||'[填寫]'}   Chemo end: ${chemo||'[填寫]'}   RT end: ${radio||'[填寫]'}\n\n`;
     t+=`All NHI criteria confirmed:\n\n`;
-    if(V('c_erpr'))t+=`(${c++}) HR Positive — ER/PR >30%: ____% confirmed on pathology.\n\n`;
-    if(V('c_her2'))t+=`(${c++}) HER2 Negative — IHC 0/1+, or IHC 2+ with negative ISH.\n\n`;
-    if(V('c_chemo'))t+=`(${c++}) Chemotherapy Completed — ________________________ (last dose: ${chemo||'____/____/____'}).\n\n`;
-    if(V('c_adj_n4'))t+=`(${c++}) Pathological ALN ≥4 Positive Nodes — surgery pathology (ALND) confirmed.\n\n`;
-    else if(V('c_adj_n13')){t+=`(${c++}) Pathological ALN 1–3 Positive Nodes — surgery pathology confirmed.\n`;if(V('c_adj_g3'))t+=`     + Grade 3 (surgical specimen)\n`;if(V('c_adj_t5u'))t+=`     + Tumor ≥5cm (surgical specimen, unifocal)\n`;if(V('c_adj_t5m'))t+=`     + Tumor ≥5cm (surgical specimen, multifocal)\n`;t+='\n';}
-    else if(V('c_neo_n13')){t+=`(${c++}) Pre-Chemo ALN 1–3 Positive Nodes (CNB/FNA confirmed).\n`;if(V('c_neo_g3'))t+=`     + Grade 3 (pre-chemo CNB)\n`;if(V('c_neo_t5u'))t+=`     + Tumor ≥5cm (pre-chemo imaging, unifocal)\n`;if(V('c_neo_t5m'))t+=`     + Tumor ≥5cm (pre-chemo imaging, multifocal)\n`;t+='\n';}
-    if(V('c_radio'))t+=`(${c++}) Radiotherapy Completed — Adjuvant RT completed ${radio||'____/____/____'}.\n\n`;
-    if(V('c_endo'))t+=`(${c++}) Endocrine Therapy ≤12 Weeks — initiated within 12 weeks.\n\n`;
-    if(V('c_surg'))t+=`(${c++}) Within 16 Months of Surgery — surgery: ${surg||'____/____/____'}.\n`;
+    if(V('c_erpr'))t+=`(${c++}) HR Positive — ${erprStr} — exceeds the required >30% threshold.\n\n`;
+    if(V('c_her2'))t+=`(${c++}) HER2 Negative — ${her2Str}.\n\n`;
+    if(V('c_chemo'))t+=`(${c++}) Chemotherapy Completed — ${reg||'________________________'} (last dose: ${chemo||'____/____/____'}).\n\n`;
+    if(V('c_adj_n4'))t+=`(${c++}) Pathological ALN ≥4 Positive Nodes — ${alnStr} confirmed (ALND).\n\n`;
+    else if(V('c_adj_n13')){
+      t+=`(${c++}) Pathological ALN 1–3 Positive Nodes — ${alnStr} (surgery pathology).\n`;
+      if(V('c_adj_g3'))t+=`     + ${gradeStr} (surgical specimen)\n`;
+      if(V('c_adj_t5u'))t+=`     + Tumor ${sizeStr} (surgical specimen, unifocal)\n`;
+      if(V('c_adj_t5m'))t+=`     + Tumor ${sizeStr} (surgical specimen, multifocal)\n`;
+      t+='\n';
+    } else if(V('c_neo_n13')){
+      t+=`(${c++}) Pre-Chemo ALN 1–3 Positive Nodes (CNB/FNA confirmed).\n`;
+      if(V('c_neo_g3'))t+=`     + ${gradeStr} (pre-chemo CNB)\n`;
+      if(V('c_neo_t5u'))t+=`     + Tumor ${sizeStr} (pre-chemo imaging, unifocal)\n`;
+      if(V('c_neo_t5m'))t+=`     + Tumor ${sizeStr} (pre-chemo imaging, multifocal)\n`;
+      t+='\n';
+    }
+    if(V('c_radio'))t+=`(${c++}) Radiotherapy Completed — Adjuvant RT to ${rtSite||'_____________'}, completed ${radio||'____/____/____'}.\n\n`;
+    if(V('c_endo'))t+=`(${c++}) Endocrine Therapy ≤12 Weeks — ${et||'[藥物名稱]'} initiated within 12 weeks of surgery/chemotherapy.\n\n`;
+    if(V('c_surg'))t+=`(${c++}) Within 16 Months of Surgery — surgery performed ${surg||'____/____/____'}.\n`;
     outEl.textContent=t; outEl.classList.remove('hidden'); cpBtn.classList.remove('hidden');
   } else {
     const bc=['c_erpr','c_her2','c_chemo','c_radio','c_endo','c_surg'].filter(V).length;
@@ -1064,15 +1262,6 @@ function copyNP(){
   }).catch(()=>alert('複製失敗，請手動選取文字'));
 }
 
-function downloadHandout(){
-  const btn=event.currentTarget; const orig=btn.innerHTML;
-  btn.innerHTML='截圖產生中...'; btn.disabled=true;
-  html2canvas(E('handout-area'),{scale:2.5,useCORS:true,backgroundColor:'#ffffff'}).then(c=>{
-    const a=document.createElement('a'); a.download='Verzenio_病人衛教單張.png';
-    a.href=c.toDataURL('image/png'); a.click(); btn.innerHTML=orig; btn.disabled=false;
-  }).catch(()=>{alert('截圖失敗');btn.innerHTML=orig;btn.disabled=false;});
-}
-
 function doScreenshot(){
   const t=E('capture-area');
   const ss=t.querySelectorAll('th,td');
@@ -1087,6 +1276,125 @@ function doScreenshot(){
 function showToast(msg){
   const t=E('toast'); t.textContent=msg; t.style.opacity=1;
   setTimeout(()=>t.style.opacity=0,2500);
+}
+
+function switchSubTab(id,btnId){
+  document.querySelectorAll('.sub-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sub-btn').forEach(b=>b.classList.remove('active'));
+  E(id).classList.add('active'); E(btnId).classList.add('active');
+}
+
+function labCheck(){
+  const er=parseFloat(E('lab_er')?.value)||0;
+  const pr=parseFloat(E('lab_pr')?.value)||0;
+  const her2=E('lab_her2')?.value||'';
+  const aln=parseInt(E('lab_aln')?.value)||0;
+  const ki67=parseFloat(E('lab_ki67')?.value)||0;
+  const grade=E('lab_grade')?.value||'';
+  const size=parseFloat(E('lab_size')?.value)||0;
+  const path=E('lab_path')?.value||'';
+
+  // ER/PR
+  const maxHR=Math.max(er,pr);
+  if(maxHR>0){
+    const ok=maxHR>30;
+    if(E('c_erpr')) E('c_erpr').checked=ok;
+    const h=E('lab_er_h');
+    if(h){ h.className='lab-hint '+(ok?'lh-ok':'lh-warn'); h.textContent=ok?`✓ 最高 ${maxHR}% > 30%，符合條件`:`✗ 最高 ${maxHR}% ≤ 30%，不符健保`; }
+  }
+  // HER2
+  if(her2){
+    const neg=['IHC0','IHC1','IHC2neg'].includes(her2);
+    if(E('c_her2')) E('c_her2').checked=neg;
+    const h=E('lr_her2_hint');
+    if(h){ h.className='text-xs px-3 mb-2 '+(neg?'lh-ok':'lh-warn'); h.textContent=neg?'✓ HER2 陰性，符合條件':'✗ HER2 陽性，不符健保條件'; h.classList.remove('hidden'); }
+  }
+  // Ki-67 → auto-tick ki67 self-pay field
+  if(ki67>0){
+    const ok=ki67>=20;
+    const nk=E('c_neo_ki67'); const ak=E('c_adj_ki67');
+    if(path==='neo'&&nk) nk.checked=ok;
+    if(path==='adj'&&ak) ak.checked=ok;
+    if(!path){ if(nk)nk.checked=ok; if(ak)ak.checked=ok; }
+    const h=E('lab_ki67_h');
+    if(h){ h.className='lab-hint '+(ok?'lh-ok':'lh-info'); h.textContent=ok?`✓ Ki-67 ${ki67}% ≥ 20%（自費條件勾選）`:`Ki-67 ${ki67}% < 20%（不達自費門檻）`; }
+  }
+  // ALN
+  if(aln>0){
+    const h=E('lab_aln_h');
+    if(path==='adj'||!path){
+      if(E('c_adj_n4')) E('c_adj_n4').checked=(aln>=4);
+      if(E('c_adj_n13')) E('c_adj_n13').checked=(aln>=1&&aln<=3);
+      if(h){ h.className='lab-hint '+(aln>=4?'lh-ok':aln>=1?'lh-ok':'lh-warn'); h.textContent=aln>=4?`✓ ALN ${aln} 顆 ≥ 4（直接符合高風險條件）`:aln>=1?`ALN ${aln} 顆（1–3），需搭配 Grade/腫瘤大小`:`✗ ALN 0 顆，未達標`; }
+    }
+    if(path==='neo'){
+      if(E('c_neo_n13')) E('c_neo_n13').checked=(aln>=1&&aln<=3);
+      if(h){ h.className='lab-hint lh-ok'; h.textContent=`術前 ALN ${aln} 顆（CNB/FNA）`; }
+    }
+  }
+  // Grade
+  if(grade){
+    const g3=grade==='3';
+    const h=E('lab_grade_h');
+    if(path==='adj'||!path){ if(E('c_adj_g3')) E('c_adj_g3').checked=g3; }
+    if(path==='neo'){ if(E('c_neo_g3')) E('c_neo_g3').checked=g3; }
+    if(h){ h.className='lab-hint '+(g3?'lh-ok':'lh-info'); h.textContent=g3?'✓ Grade 3 已勾選（高風險次要條件）':`Grade ${grade}`; }
+  }
+  // Tumor size
+  if(size>0){
+    const ok=size>=5;
+    const focal=E('lab_focal')?.value||'uni';
+    const h=E('lab_size_h');
+    if(path==='adj'||!path){
+      if(focal==='multi'){ if(E('c_adj_t5m')) E('c_adj_t5m').checked=ok; }
+      else { if(E('c_adj_t5u')) E('c_adj_t5u').checked=ok; }
+    }
+    if(path==='neo'){
+      if(focal==='multi'){ if(E('c_neo_t5m')) E('c_neo_t5m').checked=ok; }
+      else { if(E('c_neo_t5u')) E('c_neo_t5u').checked=ok; }
+    }
+    if(h){ h.className='lab-hint '+(ok?'lh-ok':'lh-info'); h.textContent=ok?`✓ ${size}cm ≥ 5cm（高風險次要條件）`:`${size}cm < 5cm`; }
+  }
+
+  runAll(); buildNP();
+}
+
+function openPatientEdu(){
+  window.open('patient_edu.html','_blank');
+}
+
+let qrInstance=null;
+function genQR(){
+  const url=E('qr_url')?.value?.trim();
+  // Default to patient_edu.html relative path
+  const target=url||'patient_edu.html';
+  _renderQR(target, url?'自訂衛教連結 QR':'捷癌寧居家照護衛教單張');
+}
+function genTextQR(){
+  const txt='捷癌寧 Verzenio® 居家照護：\n1.每天早+晚各1顆\n2.腹瀉→用Loperamide(首次2顆，之後每2hr 1顆，上限8顆)\n3.發燒≥38°C立即回診';
+  _renderQR(txt,'純文字衛教 QR（離線可用）');
+}
+function _renderQR(content, caption){
+  const c=E('qr_canvas'); if(!c) return;
+  c.innerHTML='';
+  if(typeof QRCode==='undefined'){ setTimeout(()=>_renderQR(content,caption),500); return; }
+  qrInstance=new QRCode(c,{text:content,width:180,height:180,colorDark:'#0c2340',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  const cap=E('qr_caption'); if(cap) cap.textContent=caption;
+  const bl=E('qr_block'); if(bl) bl.classList.remove('hidden');
+}
+function downloadQR(){
+  const img=E('qr_canvas')?.querySelector('img')||E('qr_canvas')?.querySelector('canvas');
+  if(!img){ showToast('請先產生 QR Code'); return; }
+  const a=document.createElement('a'); a.download='Verzenio_衛教QR.png';
+  a.href=img.tagName==='IMG'?img.src:img.toDataURL('image/png');
+  a.click();
+}
+// Auto-init QR when switching to patient sub-tab
+function switchSubTab(id,btnId){
+  document.querySelectorAll('.sub-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sub-btn').forEach(b=>b.classList.remove('active'));
+  E(id).classList.add('active'); E(btnId).classList.add('active');
+  if(id==='ae_pt') setTimeout(genQR,100);
 }
 </script>
 </body>
