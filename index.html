@@ -1360,14 +1360,14 @@ function labCheck(){
 }
 
 function openPatientEdu(){
-  window.open('patient_edu.html','_blank');
+  window.open('https://onco-tools.github.io/hr_adjuvant/patient_edu.html','_blank');
 }
 
 let qrInstance=null;
 function genQR(){
   const url=E('qr_url')?.value?.trim();
   // Default to patient_edu.html relative path
-  const target=url||'patient_edu.html';
+  const target=url||'https://onco-tools.github.io/hr_adjuvant/patient_edu.html';
   _renderQR(target, url?'自訂衛教連結 QR':'捷癌寧居家照護衛教單張');
 }
 function genTextQR(){
