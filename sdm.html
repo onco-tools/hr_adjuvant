@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YNKXFDB46Q"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-YNKXFDB46Q');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>捷癌寧 vs 擊癌利 自費決策參考</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+@media print{.no-print{display:none!important;}body{background:white!important;}.cmp-card{box-shadow:none!important;break-inside:avoid;}}
+:root{
+  --navy:#0c2340;--navy2:#1a3a5c;
+  --green:#16a34a;--green-bg:#f0fdf4;
+  --amber:#92400e;--amber-bg:#fffbeb;
+  --red:#b91c1c;--red-bg:#fff1f2;
+  --slate:#475569;--muted:#94a3b8;
+  --border:#e2e8f0;--bg:#f1f5f9;--r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);color:#1e293b;-webkit-font-smoothing:antialiased;}
+
+.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 60%,#1e4d8c 100%);padding:24px 20px 28px;position:relative;overflow:hidden;}
+.hero::after{content:'';position:absolute;right:-30px;bottom:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(59,130,246,0.2) 0%,transparent 70%);pointer-events:none;}
+.hero-pill{display:inline-block;background:rgba(255,255,255,0.13);color:rgba(255,255,255,0.9);font-size:0.7rem;font-weight:700;padding:3px 11px;border-radius:99px;border:1px solid rgba(255,255,255,0.2);margin-bottom:10px;letter-spacing:0.04em;}
+.hero-title{color:white;font-size:1.45rem;font-weight:900;line-height:1.2;letter-spacing:-0.01em;margin-bottom:5px;}
+.hero-sub{color:rgba(255,255,255,0.6);font-size:0.78rem;line-height:1.6;max-width:320px;}
+
+.content{padding:14px 16px 40px;max-width:480px;margin:0 auto;}
+
+/* Drug header */
+.drug-hdr{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.dh-a{background:#1e3a6e;border-radius:var(--r);padding:12px 14px;color:white;}
+.dh-r{background:#475569;border-radius:var(--r);padding:12px 14px;color:white;}
+.dh-name{font-size:0.9rem;font-weight:900;margin-bottom:2px;}
+.dh-sub{font-size:0.7rem;opacity:0.7;line-height:1.4;}
+.dh-badge{display:inline-block;margin-top:6px;font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:3px;}
+.dh-green{background:#f0fdf4;color:#166534;}
+.dh-slate{background:rgba(255,255,255,0.15);color:white;}
+
+/* Comparison cards */
+.cmp-card{background:white;border-radius:var(--r);border:1px solid var(--border);box-shadow:0 1px 6px rgba(0,0,0,0.04);margin-bottom:10px;overflow:hidden;}
+.cmp-label{font-size:0.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;padding:10px 14px 0;}
+.cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.cmp-a{background:#f0f7ff;border-right:1px solid var(--border);padding:10px 12px;}
+.cmp-r{background:#f8fafc;padding:10px 12px;}
+.cmp-a-title{font-size:0.78rem;font-weight:800;color:#1e3a6e;margin-bottom:5px;}
+.cmp-r-title{font-size:0.78rem;font-weight:800;color:var(--slate);margin-bottom:5px;}
+.cmp-body{font-size:0.78rem;color:#334155;line-height:1.6;}
+.cmp-body strong{color:#0f172a;}
+.warn{font-size:0.73rem;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:8px 10px;margin-top:7px;}
+.highlight-a{font-size:0.73rem;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 10px;margin-top:7px;}
+.highlight-r{font-size:0.73rem;color:var(--slate);background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:8px 10px;margin-top:7px;}
+.tag-good{display:inline-block;font-size:0.66rem;font-weight:700;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;border-radius:3px;padding:1px 6px;margin-bottom:4px;}
+.tag-warn{display:inline-block;font-size:0.66rem;font-weight:700;background:#fffbeb;color:#92400e;border:1px solid #fde68a;border-radius:3px;padding:1px 6px;margin-bottom:4px;}
+.tag-na{display:inline-block;font-size:0.66rem;font-weight:700;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;border-radius:3px;padding:1px 6px;margin-bottom:4px;}
+.se-row{display:flex;align-items:flex-start;gap:6px;padding:5px 0;border-bottom:1px solid #f1f5f9;font-size:0.77rem;color:#334155;line-height:1.5;}
+.se-row:last-child{border-bottom:none;}
+.se-icon{flex-shrink:0;width:18px;text-align:center;}
+.se-note{font-size:0.68rem;color:var(--muted);margin-top:2px;}
+.monitor-badge{font-size:0.67rem;font-weight:700;background:#dbeafe;color:#1e40af;border-radius:4px;padding:1px 5px;white-space:nowrap;}
+
+/* Decision flow */
+.flow-step{display:flex;gap:10px;margin-bottom:8px;}
+.flow-num{width:26px;height:26px;min-width:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:900;color:white;flex-shrink:0;margin-top:1px;}
+.flow-body{background:white;border:1px solid var(--border);border-radius:10px;padding:10px 12px;flex:1;font-size:0.79rem;color:#334155;line-height:1.5;}
+.flow-q{font-weight:800;color:#0f172a;margin-bottom:2px;}
+.flow-a-a{color:#1e3a6e;font-weight:700;}
+.flow-a-r{color:var(--slate);font-weight:700;}
+
+/* Footer */
+.footer{text-align:center;padding:14px 16px;font-size:0.68rem;color:var(--muted);line-height:1.7;border-top:1px solid var(--border);background:white;margin-top:8px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.cmp-card{animation:fadeUp 0.25s ease both;}
+.cmp-card:nth-child(1){animation-delay:.04s}.cmp-card:nth-child(2){animation-delay:.07s}
+.cmp-card:nth-child(3){animation-delay:.10s}.cmp-card:nth-child(4){animation-delay:.13s}
+.cmp-card:nth-child(5){animation-delay:.16s}.cmp-card:nth-child(6){animation-delay:.19s}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;">
+    <div style="flex:1;">
+      <div class="hero-pill">自費決策參考工具</div>
+      <div class="hero-title">早期乳癌輔助治療<br>藥物選擇討論指引</div>
+      <div class="hero-sub">HR+/HER2− 早期乳癌 · 請與您的臨床照顧者一起討論最適合您的選擇</div>
+    </div>
+    <div style="flex-shrink:0;text-align:center;">
+      <div id="hero_qr" style="background:white;border-radius:8px;padding:5px;width:80px;height:80px;display:flex;align-items:center;justify-content:center;"></div>
+      <div style="font-size:0.6rem;color:rgba(255,255,255,0.6);margin-top:3px;line-height:1.3;">掃描開啟<br>此頁面</div>
+    </div>
+  </div>
+  <button onclick="window.print()" class="no-print" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:99px;padding:7px 16px;font-size:0.76rem;font-weight:700;font-family:inherit;cursor:pointer;">
+    🖨️ 列印此頁面
+  </button>
+</div>
+
+<div class="content">
+
+  <!-- Drug header -->
+  <div class="drug-hdr">
+    <div class="dh-a">
+      <div class="dh-name">捷癌寧®</div>
+      <div class="dh-sub">Abemaciclib<br>每天早晚各一顆 · 服藥 2 年</div>
+      <span class="dh-badge dh-green">符合條件可健保給付</span>
+    </div>
+    <div class="dh-r">
+      <div class="dh-name">擊癌利®</div>
+      <div class="dh-sub">Ribociclib<br>每天一顆（服 3 週停 1 週）· 服藥 3 年</div>
+      <span class="dh-badge dh-slate">全程自費</span>
+    </div>
+  </div>
+
+  <!-- Disclaimer -->
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;font-size:0.74rem;color:#475569;line-height:1.6;margin-bottom:10px;">
+    ⚠️ <strong>重要說明：</strong>捷癌寧與擊癌利的數據分別來自 MonarchE 及 NATALEE 兩個獨立臨床試驗，兩者試驗族群、設計及評估方式存在差異，目前亦尚無頭對頭（head-to-head）隨機對照試驗，因此本頁所列數值<strong>不應直接相互比較</strong>，僅供參考。
+  </div>
+
+  <!-- 1. 療效 -->
+  <div class="cmp-card">
+    <div class="cmp-label">療效比較</div>
+    <div class="cmp-grid">
+      <div class="cmp-a">
+        <div class="cmp-a-title">捷癌寧®</div>
+        <div class="cmp-body">
+          <span class="tag-good">✅ 已證實改善存活</span><br>
+          追蹤 7 年，降低復發風險並<strong>顯著延長存活</strong>（統計上有意義）。<br>
+          停藥後 5 年療效仍持續。
+        </div>
+      </div>
+      <div class="cmp-r">
+        <div class="cmp-r-title">擊癌利®</div>
+        <div class="cmp-body">
+          <span class="tag-warn">⚠️ 存活數據尚未成熟</span><br>
+          追蹤 5 年，降低復發的療效相近，<strong>但存活數據尚未達統計顯著</strong>，仍需更長追蹤。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 適應症與費用 -->
+  <div class="cmp-card">
+    <div class="cmp-label">台灣適應症 / 費用</div>
+    <div class="cmp-grid">
+      <div class="cmp-a">
+        <div class="cmp-a-title">捷癌寧®</div>
+        <div class="cmp-body">
+          <span class="tag-good">台灣 TFDA 核准適應症</span><br>
+          <span style="font-size:0.72rem;color:#475569;">（含淋巴結陽性 1–3 顆且 Ki-67 ≥ 20%）</span><br>
+          符合健保條件可<strong>健保給付</strong>，費用大幅降低。<br>
+          估計自費費用：約 168 萬元 / 2 年（約 7 萬元/月）。
+        </div>
+        <div class="highlight-a">✅ 符合條件可健保給付<br><span style="font-size:0.67rem;color:#92400e;">⚠️ 淋巴結陽性 1–3 顆 + Ki-67 ≥20%：健保無給付</span></div>
+      </div>
+      <div class="cmp-r">
+        <div class="cmp-r-title">擊癌利®</div>
+        <div class="cmp-body">
+          台灣目前<strong>無早期乳癌適應症</strong>，需全程自費。<br>
+          估計費用：約 70 萬元 / 3 年（約 2 萬元/月）。
+        </div>
+        <div class="highlight-r">❌ 無健保給付，全自費</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 搭配內分泌藥物 -->
+  <div class="cmp-card">
+    <div class="cmp-label">與荷爾蒙藥物搭配</div>
+    <div class="cmp-grid">
+      <div class="cmp-a">
+        <div class="cmp-a-title">捷癌寧®</div>
+        <div class="cmp-body">
+          可搭配<strong>芳香環酶抑制劑或 Tamoxifen</strong>。<br>
+          停經前後皆有試驗數據。
+        </div>
+      </div>
+      <div class="cmp-r">
+        <div class="cmp-r-title">擊癌利®</div>
+        <div class="cmp-body">
+          只能搭配<strong>芳香環酶抑制劑</strong>。<br>
+          <strong style="color:#b91c1c;">不可與 Tamoxifen 合用</strong>（增加心律不整風險）。
+        </div>
+        <div class="warn">⚠️ 若您目前使用 Tamoxifen，請告知醫師。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 副作用 -->
+  <div class="cmp-card">
+    <div class="cmp-label">主要副作用</div>
+    <div class="cmp-grid">
+      <div class="cmp-a">
+        <div class="cmp-a-title">捷癌寧®</div>
+        <div class="cmp-body">
+          <div class="se-row"><div class="se-icon">🚽</div><div><strong>腹瀉（約 8 成病患，嚴重約 1 成）</strong><br>多在開始後 1 個月內出現，使用止瀉藥通常可改善。<div class="se-note">減量不影響療效。</div></div></div>
+          <div class="se-row"><div class="se-icon">🩸</div><div><strong>白血球偏低（嚴重 Grade 3/4 約 18%）</strong><br>需定期回院抽血監測。<div class="se-note">G3 首次無需減量。</div></div></div>
+          <div class="se-row"><div class="se-icon">🫁</div><div><strong>肺部炎症（ILD，約 3%）</strong><br>出現新發咳嗽、呼吸困難請告知醫師。</div></div>
+          <div class="se-row"><div class="se-icon">🦵</div><div><strong>靜脈血栓（VTE，約 3%）</strong><br>腿部腫脹疼痛、呼吸急促請立即就醫。</div></div>
+        </div>
+      </div>
+      <div class="cmp-r">
+        <div class="cmp-r-title">擊癌利®</div>
+        <div class="cmp-body">
+          <div class="se-row"><div class="se-icon">🩸</div><div><strong>白血球明顯偏低（45% 嚴重）</strong><br>需定期回院抽血監測。</div></div>
+          <div class="se-row"><div class="se-icon">🧪</div><div><strong>肝功能異常（8% 嚴重）</strong><br>需定期回院抽血監測（高於捷癌寧）。</div></div>
+          <div class="se-row"><div class="se-icon">❤️</div><div><strong>心電圖 QTc 延長（約 6% 需調整劑量）</strong><br>需定期回院心電圖監測，避免 QT 延長藥物。</div></div>
+          <div class="se-row"><div class="se-icon">🫁</div><div><strong>肺部炎症（約 1.5%）</strong><br>出現咳嗽、呼吸困難請告知醫師。</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 適合哪些情況 -->
+  <div class="cmp-card">
+    <div class="cmp-label">適合哪些情況選擇</div>
+    <div class="cmp-grid">
+      <div class="cmp-a">
+        <div class="cmp-a-title">較適合選擇捷癌寧®</div>
+        <div class="cmp-body">
+          <div class="se-row"><div class="se-icon">✅</div><div>符合健保給付條件</div></div>
+          <div class="se-row"><div class="se-icon">✅</div><div>目前使用 Tamoxifen</div></div>
+          <div class="se-row"><div class="se-icon">✅</div><div>有心臟疾病或心律不整病史</div></div>
+          <div class="se-row"><div class="se-icon">✅</div><div>重視已有 7 年存活獲益數據</div></div>
+          <div class="se-row"><div class="se-icon">✅</div><div>希望服藥 2 年後完成</div></div>
+        </div>
+      </div>
+      <div class="cmp-r">
+        <div class="cmp-r-title">考慮擊癌利®（自費）的情況</div>
+        <div class="cmp-body">
+          <div class="se-row"><div class="se-icon">🔹</div><div>不符合健保，但符合 NATALEE 試驗範圍</div></div>
+          <div class="se-row"><div class="se-icon">🔹</div><div>對腹瀉有強烈顧慮（腹瀉率 15% vs 84%）</div></div>
+          <div class="se-row"><div class="se-icon">🔹</div><div>能接受定期心電圖及較頻繁監測</div></div>
+        </div>
+        <div class="warn">⚠️ 台灣目前無此適應症，請與醫師充分討論再決定。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. 快速決策 -->
+  <div class="cmp-card" style="padding:12px 14px;">
+    <div class="cmp-label" style="padding:0 0 10px;">決策流程參考</div>
+    <div class="flow-step">
+      <div class="flow-num" style="background:#1e3a6e;">1</div>
+      <div class="flow-body"><div class="flow-q">符合健保條件？</div>是 → <span class="flow-a-a">捷癌寧®（健保）</span></div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num" style="background:#1e40af;">2</div>
+      <div class="flow-body"><div class="flow-q">目前使用 Tamoxifen？</div>是 → <span class="flow-a-a">捷癌寧®（自費）</span>；擊癌利® 不可使用</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num" style="background:#2563eb;">3</div>
+      <div class="flow-body"><div class="flow-q">有心臟疾病 / 心律不整病史？</div>是 → <span class="flow-a-a">捷癌寧®（自費）</span></div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num" style="background:#475569;">4</div>
+      <div class="flow-body"><div class="flow-q">腹瀉顧慮且可接受定期心電圖監測？</div>考慮 <span class="flow-a-r">擊癌利®（自費）</span>，需告知台灣無適應症</div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<div class="footer">
+  本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供臨床照顧者與病患自費決策參考。<br>
+  內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。版本日期：2026年3月
+</div>
+
+<script>
+(function(){
+  function tryQR(){
+    if(typeof QRCode==='undefined'){setTimeout(tryQR,300);return;}
+    const c=document.getElementById('hero_qr');
+    if(!c) return;
+    new QRCode(c,{text:'https://onco-tools.github.io/hr_adjuvant/sdm.html',width:70,height:70,colorDark:'#0c2340',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  }
+  tryQR();
+})();
+</script>
+</body>
+</html>

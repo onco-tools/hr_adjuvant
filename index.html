@@ -23,7 +23,7 @@
 :root{--navy:#0c2340;--bg:#f0f4f8;}
 body{background:var(--bg);font-family:'Noto Sans TC',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;color:#1e293b;}
 
-.tab-nav{display:flex;gap:3px;background:white;border-radius:16px;padding:5px;box-shadow:0 2px 10px rgba(0,0,0,0.07);overflow-x:auto;margin-bottom:16px;}
+.tab-nav{display:flex;gap:3px;background:white;border-radius:0;padding:8px 16px 6px;box-shadow:0 2px 10px rgba(0,0,0,0.09);overflow-x:auto;margin-bottom:16px;position:sticky;top:0;z-index:100;}
 .tab-nav::-webkit-scrollbar{display:none;}
 .tab-btn{flex-shrink:0;padding:9px 12px;border-radius:11px;border:none;cursor:pointer;font-weight:700;font-size:0.77rem;transition:all 0.18s;white-space:nowrap;background:transparent;color:#64748b;font-family:inherit;}
 .tab-btn.active{background:var(--navy);color:white;box-shadow:0 2px 8px rgba(12,35,64,0.3);}
@@ -161,9 +161,12 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
 
   <!-- Header -->
   <div class="mb-5 no-print">
-    <div class="flex items-center justify-between mb-2">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
       <h1 class="text-xl font-black text-slate-900 tracking-tight">ER+/HER2− 早期乳癌輔助工具</h1>
-      <span class="text-xs text-slate-400 flex-shrink-0 ml-3">2026年3月</span>
+      <div style="flex-shrink:0;text-align:center;">
+        <div id="header_qr" style="width:52px;height:52px;"></div>
+        <div style="font-size:0.58rem;color:#94a3b8;margin-top:2px;">分享工具</div>
+      </div>
     </div>
   </div>
 
@@ -172,7 +175,7 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
     <button class="tab-btn" onclick="switchTab('tab3',this)">事審文字</button>
     <button class="tab-btn" onclick="switchTab('tab2',this)">AE 管理</button>
     <button class="tab-btn" onclick="switchTab('tab4',this)">藥物對照</button>
-    <button class="tab-btn" onclick="switchTab('tab5',this)">共同決策</button>
+    <button class="tab-btn" onclick="switchTab('tab5',this)">自費決策參考</button>
   </div>
 
   <!-- ══════ TAB 1 條件評估 ══════ -->
@@ -202,7 +205,7 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
         <label class="cr"><input type="checkbox" id="c_neo_g3" onchange="runAll()"><span class="text-sm text-slate-600">化療前病理（CNB）Grade 3</span></label>
         <label class="cr"><input type="checkbox" id="c_neo_t5u" onchange="runAll()"><span class="text-sm text-slate-600">化療前影像腫瘤 ≥ 5cm（Unifocal）</span></label>
         <label class="cr"><input type="checkbox" id="c_neo_t5m" onchange="runAll()"><span class="text-sm text-slate-600">化療前影像腫瘤 ≥ 5cm（Multifocal/Multicentric 加總）</span></label>
-        <label class="cr" style="border:1.5px dashed #fbbf24!important;"><input type="checkbox" id="c_neo_ki67" onchange="runAll()"><div><div class="text-sm text-slate-600">化療前 Ki-67 ≥ 20%（CNB）<span class="ki67-mark">自費條件 · 指引推薦</span></div></div></label>
+        <label class="cr"><input type="checkbox" id="c_neo_ki67" onchange="runAll()"><div><div class="text-sm text-slate-600">化療前 Ki-67 ≥ 20%（CNB）<span class="ki67-mark">自費 · NCCN/ESMO/ASCO指引建議</span></div></div></label>
       </div>
       <div class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1 mt-3 mb-1.5">Adjuvant — 手術病理</div>
       <label class="cr"><input type="checkbox" id="c_adj_n4" onchange="runAll()"><div><div class="cr-label">手術病理 ALN ≥ 4 顆</div></div></label>
@@ -211,33 +214,91 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
         <label class="cr"><input type="checkbox" id="c_adj_g3" onchange="runAll()"><span class="text-sm text-slate-600">手術病理 Grade 3</span></label>
         <label class="cr"><input type="checkbox" id="c_adj_t5u" onchange="runAll()"><span class="text-sm text-slate-600">手術病理腫瘤 ≥ 5cm（Unifocal）</span></label>
         <label class="cr"><input type="checkbox" id="c_adj_t5m" onchange="runAll()"><span class="text-sm text-slate-600">手術病理腫瘤 ≥ 5cm（Multifocal/Multicentric 加總）</span></label>
-        <label class="cr" style="border:1.5px dashed #fbbf24!important;"><input type="checkbox" id="c_adj_ki67" onchange="runAll()"><div><div class="text-sm text-slate-600">手術病理 Ki-67 ≥ 20%<span class="ki67-mark">自費條件 · 指引推薦</span></div></div></label>
+        <label class="cr"><input type="checkbox" id="c_adj_ki67" onchange="runAll()"><div><div class="text-sm text-slate-600">手術病理 Ki-67 ≥ 20%<span class="ki67-mark">自費 · NCCN/ESMO/ASCO指引建議</span></div></div></label>
       </div>
     </div>
     <div class="card">
       <div class="card-title">排除條件（健保不給付）</div>
-      <label class="cr"><input type="checkbox" id="c_exc_male" onchange="runAll()"><span class="cr-label">男性患者</span></label>
-      <label class="cr"><input type="checkbox" id="c_exc_erpr" onchange="runAll()"><span class="cr-label">ER/PR ≤ 30%</span></label>
+      <div class="card-sub">以下情況不符合健保給付資格</div>
+      <div style="padding:9px 12px;background:#f8fafc;border-radius:8px;margin-bottom:6px;font-size:0.84rem;color:#475569;border:1px solid #e2e8f0;">男性患者</div>
+      <div style="padding:9px 12px;background:#f8fafc;border-radius:8px;font-size:0.84rem;color:#475569;border:1px solid #e2e8f0;">ER/PR ≤ 30%</div>
+    </div>
+
+    <!-- Ki67條件外自費風險考量 -->
+    <div class="card">
+      <div class="card-title">🔍 自費條件外復發風險考量</div>
+      <div class="card-sub">以下臨床特徵雖非健保或臨床試驗收案條件，但可能代表較高復發風險，可於門診與病患討論自費使用的合理性</div>
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:9px;padding:10px 12px;font-size:0.76rem;color:#1e40af;margin-bottom:10px;line-height:1.6;">
+        💡 若病患已符合自費使用之 Ki-67 ≥ 20% 條件，同時具備以下一項或多項臨床特徵，則自費使用之建議強度更高。
+      </div>
+      <div style="font-size:0.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;">以下臨床特徵具較高復發風險</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <div style="display:flex;align-items:flex-start;gap:7px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:0.79rem;color:#334155;">
+          <span style="flex-shrink:0;margin-top:1px;">📏</span><div><div style="font-weight:600;">腫瘤 T2</div><div style="font-size:0.7rem;color:#94a3b8;">腫瘤最大徑 &gt;2cm</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:7px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:0.79rem;color:#334155;">
+          <span style="flex-shrink:0;margin-top:1px;">🔢</span><div><div style="font-weight:600;">Grade 2</div><div style="font-size:0.7rem;color:#94a3b8;">組織學分級 2 級</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:7px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:0.79rem;color:#334155;">
+          <span style="flex-shrink:0;margin-top:1px;">👤</span><div><div style="font-weight:600;">年齡 &lt; 40 歲</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:7px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:0.79rem;color:#334155;">
+          <span style="flex-shrink:0;margin-top:1px;">🔴</span><div><div style="font-weight:600;">未停經</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:7px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:0.79rem;color:#334155;">
+          <span style="flex-shrink:0;margin-top:1px;">🧬</span><div><div style="font-weight:600;">管腔 B 型</div><div style="font-size:0.7rem;color:#94a3b8;">Luminal B</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:7px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:0.79rem;color:#334155;">
+          <span style="flex-shrink:0;margin-top:1px;">💊</span><div><div style="font-weight:600;">未病理完全緩解</div><div style="font-size:0.7rem;color:#94a3b8;">non-pCR（新輔助治療後）</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:7px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:0.79rem;color:#334155;">
+          <span style="flex-shrink:0;margin-top:1px;">🧪</span><div><div style="font-weight:600;">循環腫瘤 DNA 陽性</div><div style="font-size:0.7rem;color:#94a3b8;">ctDNA +</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:7px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:0.79rem;color:#334155;">
+          <span style="flex-shrink:0;margin-top:1px;">🩸</span><div><div style="font-weight:600;">淋巴血管侵犯</div><div style="font-size:0.7rem;color:#94a3b8;">LVI</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:7px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:0.79rem;color:#334155;">
+          <span style="flex-shrink:0;margin-top:1px;">🔬</span><div><div style="font-weight:600;">周邊神經侵犯</div><div style="font-size:0.7rem;color:#94a3b8;">PNI</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:7px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:0.79rem;color:#334155;">
+          <span style="flex-shrink:0;margin-top:1px;">📊</span><div><div style="font-weight:600;">基因檢測高復發風險</div><div style="font-size:0.7rem;color:#94a3b8;">如 Oncotype DX、MammaPrint 高風險</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:7px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:0.79rem;color:#334155;grid-column:span 2;">
+          <span style="flex-shrink:0;margin-top:1px;">📍</span><div><div style="font-weight:600;">鎖骨上或內乳淋巴結陽性</div><div style="font-size:0.7rem;color:#94a3b8;">（不計入健保 ALN 條件，但具高風險意義）</div></div>
+        </div>
+      </div>
+      <div style="margin-top:10px;background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:9px 12px;font-size:0.74rem;color:#78350f;line-height:1.6;">
+        ⚠️ 以上特徵目前非臨床試驗收案條件或健保給付依據，療效資料有限。建議個別評估後與病患進行共同決策並記錄。
+      </div>
     </div>
     <div id="result_block" class="hidden">
       <div id="result_main" class="text-lg font-black mb-1"></div>
       <div id="result_sub" class="text-sm"></div>
       <div id="result_missing" class="hidden mt-3"></div>
+      <div id="result_goto" class="hidden mt-3">
+        <button onclick="document.querySelector('[onclick*=tab3]').click()" class="btn bn bf" style="background:#0c2340;">→ 前往事審文字填寫申請內容</button>
+      </div>
     </div>
-    <div class="mt-4 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。</div>
+    <div class="mt-4 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。版本日期：2026年3月</div>
   </div>
 
   <!-- ══════ TAB 2 AE 管理 ══════ -->
   <div id="tab2" class="tab-content">
 
     <!-- Sub-tab nav -->
-    <div class="sub-nav">
-      <button class="sub-btn active" id="ae_hcp_btn" onclick="switchSubTab('ae_hcp','ae_hcp_btn')">醫護版 AE 管理</button>
-      <button class="sub-btn" id="ae_pt_btn" onclick="switchSubTab('ae_pt','ae_pt_btn')">病人衛教 QR</button>
+    <div style="display:flex;gap:6px;margin-bottom:14px;">
+      <button id="ae_pt_btn" onclick="switchSubTab('ae_pt','ae_pt_btn')"
+        style="flex:1;background:#0c2340;color:white;border:1.5px solid #0c2340;border-radius:8px;padding:8px 12px;cursor:pointer;font-family:inherit;font-size:0.77rem;font-weight:700;text-align:center;transition:all 0.15s;">
+        衛教資訊 · QR Code
+      </button>
+      <button id="ae_hcp_btn" onclick="switchSubTab('ae_hcp','ae_hcp_btn')"
+        style="flex:1;background:white;color:#334155;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 12px;cursor:pointer;font-family:inherit;font-size:0.77rem;font-weight:700;text-align:center;transition:all 0.15s;">
+        AE 管理（醫護）
+      </button>
     </div>
 
     <!-- ── HCP sub-tab ── -->
-    <div id="ae_hcp" class="sub-content active">
+    <div id="ae_hcp" class="sub-content">
     <div class="ae-section-hdr">
       <div class="ae-pill ae-pill-a">Abemaciclib</div>
       <span class="text-sm font-bold text-slate-700">AE 管理</span>
@@ -257,10 +318,10 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
           <div><div class="text-xs text-slate-400 mb-0.5">每日上限</div><div class="text-2xl font-black text-red-600">8</div><div class="text-xs text-slate-500">顆</div></div>
         </div>
       </div>
-      <div class="ds g1"><div><span class="bd bd-g">Grade 1</span><div class="font-bold text-sm mt-0.5">排便增加 &lt; 4 次/天</div></div><div class="text-right flex-shrink-0"><div class="font-bold text-emerald-700 text-sm">繼續 150mg BID</div></div></div>
-      <div class="ds g2"><div><span class="bd bd-y">Grade 2</span><div class="font-bold text-sm mt-0.5">增加 4–6 次（24hr 未緩解）</div></div><div class="text-right flex-shrink-0"><div class="text-sm font-bold text-slate-600">暫停</div><div class="font-bold text-emerald-700 text-sm">→ 恢復原劑量</div></div></div>
+      <div class="ds g1"><div><span class="bd bd-g">Grade 1</span><div class="font-bold text-sm mt-0.5">排便增加 &lt; 4 次/天</div><div class="text-xs text-slate-400 mt-0.5">無功能障礙</div></div><div class="text-right flex-shrink-0"><div class="font-bold text-emerald-700 text-sm">繼續 150mg BID</div></div></div>
+      <div class="ds g2"><div><span class="bd bd-y">Grade 2</span><div class="font-bold text-sm mt-0.5">增加 4–6 次（24hr 未緩解）</div><div class="text-xs text-slate-400 mt-0.5">日常工具性活動受限（如購物、煮飯）</div></div><div class="text-right flex-shrink-0"><div class="text-sm font-bold text-slate-600">暫停</div><div class="font-bold text-emerald-700 text-sm">→ 恢復原劑量</div></div></div>
       <div class="ds g2r"><div><span class="bd bd-y">Grade 2 反覆</span><div class="font-bold text-sm mt-0.5">同劑量再次出現</div></div><div class="text-right flex-shrink-0"><div class="font-bold text-orange-600 text-sm">暫停 → 150→100mg BID</div></div></div>
-      <div class="ds g3"><div><span class="bd">Grade 3/4</span><div class="font-bold text-sm mt-0.5">增加 ≥ 7 次 / 住院</div></div><div class="text-right flex-shrink-0"><div class="font-bold text-red-700 text-sm">暫停 → 降一階劑量</div></div></div>
+      <div class="ds g3"><div><span class="bd">Grade 3/4</span><div class="font-bold text-sm mt-0.5">增加 ≥ 7 次 / 住院</div><div class="text-xs text-slate-400 mt-0.5">G3：日常自理活動受限；G4：危及生命</div></div><div class="text-right flex-shrink-0"><div class="font-bold text-red-700 text-sm">暫停 → 降一階劑量</div></div></div>
       <!-- Dose reduction efficacy highlight -->
       <div class="mt-3" style="background:#dcfce7;border:1.5px solid #86efac;border-radius:12px;padding:12px 14px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
@@ -311,6 +372,15 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
       <button class="acc-btn" onclick="toggleAcc('acc_hem',this)"><div class="card-title mb-0">🩸 嗜中性球低下 / 血液毒性</div><span class="ch">▼</span></button>
       <div id="acc_hem" class="acc-body">
         <div class="text-xs text-slate-500 mb-2 mt-2">嗜中性球低下症（實驗室數值）G3/4 發生率 18%；首次 G3 暫停但不需降劑量，復發性 G3 或 G4 才降劑量</div>
+        <div class="mb-2 p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+          <div class="font-bold text-slate-500 mb-1.5">CTCAE 嗜中性球絕對值（ANC）等級定義</div>
+          <div class="grid grid-cols-4 gap-1 text-center">
+            <div class="bg-green-50 border border-green-200 rounded p-1.5"><div class="font-bold text-green-700 text-xs">G1</div><div class="text-slate-500 text-xs mt-0.5">&lt;LLN–1500/mm³</div></div>
+            <div class="bg-yellow-50 border border-yellow-200 rounded p-1.5"><div class="font-bold text-yellow-700 text-xs">G2</div><div class="text-slate-500 text-xs mt-0.5">&lt;1500–1000/mm³</div></div>
+            <div class="bg-orange-50 border border-orange-200 rounded p-1.5"><div class="font-bold text-orange-700 text-xs">G3</div><div class="text-slate-500 text-xs mt-0.5">&lt;1000–500/mm³</div></div>
+            <div class="bg-red-50 border border-red-200 rounded p-1.5"><div class="font-bold text-red-700 text-xs">G4</div><div class="text-slate-500 text-xs mt-0.5">&lt;500/mm³</div></div>
+          </div>
+        </div>
         <table class="ct"><thead><tr><th>CTCAE 等級</th><th>處置（依 TFDA 仿單 表2）</th></tr></thead><tbody>
           <tr><td>G1 / G2</td><td class="font-bold text-emerald-700">無需調整劑量，繼續治療</td></tr>
           <tr><td><span class="bd bd-y">G3</span>（首次）</td><td>暫停至 ≤ G2 恢復 → <strong>無需降劑量</strong>，恢復原劑量</td></tr>
@@ -325,6 +395,15 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
       <button class="acc-btn" onclick="toggleAcc('acc_lft',this)"><div class="card-title mb-0">🧪 肝功能異常</div><span class="ch">▼</span></button>
       <div id="acc_lft" class="acc-body">
         <div class="text-xs text-slate-500 mb-2 mt-2">monarchE ALT↑ 37% (G3: 2.5%)、AST↑ 31% (G3: 1.5%)；LFT 監測排程同 CBC</div>
+        <div class="mb-2 p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+          <div class="font-bold text-slate-500 mb-1.5">CTCAE ALT / AST 等級定義（× ULN）</div>
+          <div class="grid grid-cols-4 gap-1 text-center">
+            <div class="bg-green-50 border border-green-200 rounded p-1.5"><div class="font-bold text-green-700 text-xs">G1</div><div class="text-slate-500 text-xs mt-0.5">&gt;ULN–3×</div></div>
+            <div class="bg-yellow-50 border border-yellow-200 rounded p-1.5"><div class="font-bold text-yellow-700 text-xs">G2</div><div class="text-slate-500 text-xs mt-0.5">&gt;3–5×</div></div>
+            <div class="bg-orange-50 border border-orange-200 rounded p-1.5"><div class="font-bold text-orange-700 text-xs">G3</div><div class="text-slate-500 text-xs mt-0.5">&gt;5–20×</div></div>
+            <div class="bg-red-50 border border-red-200 rounded p-1.5"><div class="font-bold text-red-700 text-xs">G4</div><div class="text-slate-500 text-xs mt-0.5">&gt;20×</div></div>
+          </div>
+        </div>
         <table class="ct"><thead><tr><th>ALT/AST 等級</th><th>處置（依 TFDA 仿單 表4）</th></tr></thead><tbody>
           <tr><td>G1 / G2（未合併膽紅素 &gt;2× ULN）</td><td class="font-bold text-emerald-700">無需調整劑量</td></tr>
           <tr><td><span class="bd bd-y">G2 持續或復發</span>、或 G3（5–20× ULN）</td><td>暫停至恢復基準值或 ≤ G1 → 降一階劑量恢復</td></tr>
@@ -350,6 +429,15 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
       <button class="acc-btn" onclick="toggleAcc('acc_ild',this)"><div class="card-title mb-0">🫁 間質性肺炎（ILD）</div><span class="ch">▼</span></button>
       <div id="acc_ild" class="acc-body">
         <div class="text-xs text-slate-500 mb-2 mt-2">monarchE 發生率 3%（G3/4：0.4%）；有 1 例致死（0.1%）</div>
+        <div class="mb-2 p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+          <div class="font-bold text-slate-500 mb-1.5">CTCAE 肺炎（Pneumonitis）等級定義</div>
+          <div class="space-y-1">
+            <div class="flex gap-2 items-start"><span class="font-bold text-green-700 w-6 flex-shrink-0">G1</span><span class="text-slate-600">無症狀；僅影像學發現</span></div>
+            <div class="flex gap-2 items-start"><span class="font-bold text-yellow-700 w-6 flex-shrink-0">G2</span><span class="text-slate-600">有症狀（咳嗽、氣喘）；日常工具性活動受限；需藥物治療</span></div>
+            <div class="flex gap-2 items-start"><span class="font-bold text-orange-700 w-6 flex-shrink-0">G3</span><span class="text-slate-600">嚴重症狀；日常自理受限；需氧氣補充；需住院</span></div>
+            <div class="flex gap-2 items-start"><span class="font-bold text-red-700 w-6 flex-shrink-0">G4</span><span class="text-slate-600">危及生命；需緊急介入（如插管/呼吸器）</span></div>
+          </div>
+        </div>
         <table class="ct"><thead><tr><th>Grade</th><th>處置（依 TFDA 仿單 表5）</th></tr></thead><tbody>
           <tr><td><span class="bd bd-g">G1 / G2</span></td><td class="font-bold text-emerald-700">無需調整劑量，密切監測</td></tr>
           <tr><td><span class="bd bd-y">G2 持續或復發</span>，給予最大支持性治療仍未於 7 天內緩解至 ≤ G1</td><td>暫停至恢復基準值或 ≤ G1 → 降一階劑量恢復</td></tr>
@@ -364,6 +452,15 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
       <button class="acc-btn" onclick="toggleAcc('acc_vte',this)"><div class="card-title mb-0">🦵 靜脈血栓栓塞（VTE）</div><span class="ch">▼</span></button>
       <div id="acc_vte" class="acc-body">
         <div class="text-xs text-slate-500 mb-2 mt-2">monarchE 發生率 3%（DVT、PE 及其他）；臨床上曾有致死案例</div>
+        <div class="mb-2 p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+          <div class="font-bold text-slate-500 mb-1.5">CTCAE 靜脈血栓等級定義</div>
+          <div class="space-y-1">
+            <div class="flex gap-2 items-start"><span class="font-bold text-green-700 w-6 flex-shrink-0">G1</span><span class="text-slate-600">無症狀；影像偶然發現（如影像學發現淺層血栓）</span></div>
+            <div class="flex gap-2 items-start"><span class="font-bold text-yellow-700 w-6 flex-shrink-0">G2</span><span class="text-slate-600">有症狀（肢體腫脹、疼痛、DVT）；需藥物治療（抗凝）</span></div>
+            <div class="flex gap-2 items-start"><span class="font-bold text-orange-700 w-6 flex-shrink-0">G3</span><span class="text-slate-600">肺栓塞（PE）；需緊急介入（溶栓或手術）；需住院</span></div>
+            <div class="flex gap-2 items-start"><span class="font-bold text-red-700 w-6 flex-shrink-0">G4</span><span class="text-slate-600">危及生命（血行動力學不穩定）</span></div>
+          </div>
+        </div>
         <table class="ct"><thead><tr><th>情境</th><th>處置（依 TFDA 仿單 表6）</th></tr></thead><tbody>
           <tr><td>早期乳癌（EBC）— 任何等級</td><td>暫停用藥，給予臨床處置；病人臨床情況穩定後恢復 Verzenio 治療</td></tr>
         </tbody></table>
@@ -382,6 +479,15 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
       <button class="acc-btn" onclick="toggleAcc('acc_r_neu',this)"><div class="card-title mb-0">🩸 嗜中性球低下（主要副作用）</div><span class="ch">▼</span></button>
       <div id="acc_r_neu" class="acc-body">
         <div class="text-xs text-slate-500 mb-2 mt-2">G3/4 發生率 45%；嗜中性球低下為 NATALEE 最主要停藥及降劑量原因</div>
+        <div class="mb-2 p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+          <div class="font-bold text-slate-500 mb-1.5">CTCAE ANC 等級定義</div>
+          <div class="grid grid-cols-4 gap-1 text-center">
+            <div class="bg-green-50 border border-green-200 rounded p-1.5"><div class="font-bold text-green-700 text-xs">G1</div><div class="text-slate-500 text-xs mt-0.5">&lt;LLN–1500/mm³</div></div>
+            <div class="bg-yellow-50 border border-yellow-200 rounded p-1.5"><div class="font-bold text-yellow-700 text-xs">G2</div><div class="text-slate-500 text-xs mt-0.5">&lt;1500–1000/mm³</div></div>
+            <div class="bg-orange-50 border border-orange-200 rounded p-1.5"><div class="font-bold text-orange-700 text-xs">G3</div><div class="text-slate-500 text-xs mt-0.5">&lt;1000–500/mm³</div></div>
+            <div class="bg-red-50 border border-red-200 rounded p-1.5"><div class="font-bold text-red-700 text-xs">G4</div><div class="text-slate-500 text-xs mt-0.5">&lt;500/mm³</div></div>
+          </div>
+        </div>
         <table class="ct"><thead><tr><th>Grade</th><th>處置</th></tr></thead><tbody>
           <tr><td>G1–2</td><td>繼續，每 2 週監測 CBC</td></tr>
           <tr><td><span class="bd" style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;">G3</span>（首次）</td><td>暫停 → 恢復 ≤ G1 → 恢復原劑量</td></tr>
@@ -397,6 +503,15 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
       <button class="acc-btn" onclick="toggleAcc('acc_r_lft',this)"><div class="card-title mb-0">🧪 肝功能異常（Ribociclib）</div><span class="ch">▼</span></button>
       <div id="acc_r_lft" class="acc-body">
         <div class="text-xs text-slate-500 mb-2 mt-2">ALT↑ 45%（G3/4: 8%）、AST↑ 44%（G3/4: 5%）；明顯高於 Abemaciclib；為最主要永久停藥原因（8%）</div>
+        <div class="mb-2 p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+          <div class="font-bold text-slate-500 mb-1.5">CTCAE ALT / AST 等級定義（× ULN）</div>
+          <div class="grid grid-cols-4 gap-1 text-center">
+            <div class="bg-green-50 border border-green-200 rounded p-1.5"><div class="font-bold text-green-700 text-xs">G1</div><div class="text-slate-500 text-xs mt-0.5">&gt;ULN–3×</div></div>
+            <div class="bg-yellow-50 border border-yellow-200 rounded p-1.5"><div class="font-bold text-yellow-700 text-xs">G2</div><div class="text-slate-500 text-xs mt-0.5">&gt;3–5×</div></div>
+            <div class="bg-orange-50 border border-orange-200 rounded p-1.5"><div class="font-bold text-orange-700 text-xs">G3</div><div class="text-slate-500 text-xs mt-0.5">&gt;5–20×</div></div>
+            <div class="bg-red-50 border border-red-200 rounded p-1.5"><div class="font-bold text-red-700 text-xs">G4</div><div class="text-slate-500 text-xs mt-0.5">&gt;20×</div></div>
+          </div>
+        </div>
         <table class="ct"><thead><tr><th>Grade</th><th>處置</th></tr></thead><tbody>
           <tr><td>G1–2（未合併膽紅素升高）</td><td>繼續，加強監測 LFT 頻率</td></tr>
           <tr><td><span class="bd" style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;">G3</span>（5–20× ULN）</td><td>暫停 → 恢復後降一階劑量</td></tr>
@@ -412,6 +527,15 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
       <button class="acc-btn" onclick="toggleAcc('acc_r_qt',this)"><div class="card-title mb-0">❤️‍🩹 QTc 延長</div><span class="ch">▼</span></button>
       <div id="acc_r_qt" class="acc-body">
         <div class="text-xs text-slate-500 mb-2 mt-2">需定期 ECG；避免 QT 延長藥物；每次 ECG 前補充電解質</div>
+        <div class="mb-2 p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+          <div class="font-bold text-slate-500 mb-1.5">CTCAE QTc 延長等級定義</div>
+          <div class="space-y-1">
+            <div class="flex gap-2 items-start"><span class="font-bold text-green-700 w-6 flex-shrink-0">G1</span><span class="text-slate-600">QTc 450–480ms；無症狀</span></div>
+            <div class="flex gap-2 items-start"><span class="font-bold text-yellow-700 w-6 flex-shrink-0">G2</span><span class="text-slate-600">QTc 481–500ms；無症狀</span></div>
+            <div class="flex gap-2 items-start"><span class="font-bold text-orange-700 w-6 flex-shrink-0">G3</span><span class="text-slate-600">QTc &gt;500ms；或與基準值比較延長 &gt;60ms；無症狀</span></div>
+            <div class="flex gap-2 items-start"><span class="font-bold text-red-700 w-6 flex-shrink-0">G4</span><span class="text-slate-600">危及生命（如 Torsades de Pointes / 室性心律不整）；需緊急介入</span></div>
+          </div>
+        </div>
         <table class="ct"><thead><tr><th>QTc 數值</th><th>處置</th></tr></thead><tbody>
           <tr><td>&lt; 481ms</td><td>繼續原劑量</td></tr>
           <tr><td>481–500ms</td><td>暫停 → QTc 恢復 &lt;481ms 後恢復原劑量</td></tr>
@@ -426,6 +550,15 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
       <button class="acc-btn" onclick="toggleAcc('acc_r_ild',this)"><div class="card-title mb-0">🫁 間質性肺病（Ribociclib）</div><span class="ch">▼</span></button>
       <div id="acc_r_ild" class="acc-body">
         <div class="text-xs text-slate-500 mb-2 mt-2">發生率約 1.5%，低於 Abemaciclib（3%）</div>
+        <div class="mb-2 p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+          <div class="font-bold text-slate-500 mb-1.5">CTCAE 肺炎等級定義</div>
+          <div class="space-y-1">
+            <div class="flex gap-2 items-start"><span class="font-bold text-green-700 w-6 flex-shrink-0">G1</span><span class="text-slate-600">無症狀；僅影像學發現</span></div>
+            <div class="flex gap-2 items-start"><span class="font-bold text-yellow-700 w-6 flex-shrink-0">G2</span><span class="text-slate-600">有症狀（咳嗽、呼吸困難）；日常工具性活動受限</span></div>
+            <div class="flex gap-2 items-start"><span class="font-bold text-orange-700 w-6 flex-shrink-0">G3</span><span class="text-slate-600">嚴重症狀；需氧氣補充；日常自理活動受限</span></div>
+            <div class="flex gap-2 items-start"><span class="font-bold text-red-700 w-6 flex-shrink-0">G4</span><span class="text-slate-600">危及生命；需緊急介入（如插管）</span></div>
+          </div>
+        </div>
         <table class="ct"><thead><tr><th>Grade</th><th>處置</th></tr></thead><tbody>
           <tr><td>G1–2</td><td>暫停；考慮類固醇；恢復後可降階使用</td></tr>
           <tr><td><span class="bd" style="background:#fff1f2;color:#991b1b;border:1px solid #fecaca;">G3–4</span></td><td class="rd">永久停藥 + 類固醇治療</td></tr>
@@ -439,6 +572,15 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
       <button class="acc-btn" onclick="toggleAcc('acc_r_skin',this)"><div class="card-title mb-0">🔴 皮膚反應</div><span class="ch">▼</span></button>
       <div id="acc_r_skin" class="acc-body">
         <div class="text-xs text-slate-500 mb-2 mt-2">皮疹 G3/4 約 0.9%；Stevens-Johnson Syndrome / Toxic Epidermal Necrolysis（SJS/TEN）有罕見案例</div>
+        <div class="mb-2 p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+          <div class="font-bold text-slate-500 mb-1.5">CTCAE 皮疹（斑丘疹）等級定義</div>
+          <div class="space-y-1">
+            <div class="flex gap-2 items-start"><span class="font-bold text-green-700 w-6 flex-shrink-0">G1</span><span class="text-slate-600">皮疹 &lt;10% BSA；無症狀</span></div>
+            <div class="flex gap-2 items-start"><span class="font-bold text-yellow-700 w-6 flex-shrink-0">G2</span><span class="text-slate-600">皮疹 10–30% BSA；有症狀（搔癢、灼熱）；日常工具性活動受限</span></div>
+            <div class="flex gap-2 items-start"><span class="font-bold text-orange-700 w-6 flex-shrink-0">G3</span><span class="text-slate-600">皮疹 &gt;30% BSA；日常自理活動受限；需口服或靜脈藥物治療</span></div>
+            <div class="flex gap-2 items-start"><span class="font-bold text-red-700 w-6 flex-shrink-0">G4</span><span class="text-slate-600">危及生命（SJS / TEN）；需緊急介入</span></div>
+          </div>
+        </div>
         <table class="ct"><thead><tr><th>Grade</th><th>處置</th></tr></thead><tbody>
           <tr><td>G1–2</td><td>繼續，局部治療；密切觀察</td></tr>
           <tr><td><span class="bd" style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;">G3</span></td><td>暫停 → 恢復後降一階劑量</td></tr>
@@ -452,9 +594,9 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
     </div><!-- /ae_hcp -->
 
     <!-- ── Patient QR sub-tab ── -->
-    <div id="ae_pt" class="sub-content">
+    <div id="ae_pt" class="sub-content active">
       <div class="card">
-        <div class="card-title">📱 病人衛教 QR Code</div>
+        <div class="card-title">📱 患者衛教 QR Code</div>
         <div class="card-sub">掃描後即可查看完整居家照護衛教單張</div>
 
         <!-- QR display — auto generated on tab switch -->
@@ -470,7 +612,7 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
         </div>
 
         <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 12px;font-size:0.78rem;color:#1e40af;margin-top:12px;">
-          💡 可將 QR Code 貼在藥袋、衛教單或診間看板，病人掃描即可查看。
+          💡 可將 QR Code 貼在藥袋、衛教單或診間看板，患者掃描即可查看。
         </div>
 
         <div class="mt-4">
@@ -483,7 +625,7 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
       </div>
     </div><!-- /ae_pt -->
 
-    <div class="mt-4 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。</div>
+    <div class="mt-4 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。版本日期：2026年3月</div>
 
   </div><!-- /tab2 -->
 
@@ -588,12 +730,6 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
         <input type="text" id="lab_et" class="lab-inp" placeholder="e.g. Letrozole" style="width:150px;text-align:left;" oninput="buildNP()">
       </div>
 
-      <!-- Patient ID -->
-      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 mt-3">病人識別</div>
-      <div class="lab-row">
-        <div class="lab-label">病歷號 / 姓名</div>
-        <input type="text" id="np_pid" class="lab-inp" placeholder="00000000 / 王○○" style="width:180px;text-align:left;" oninput="buildNP()">
-      </div>
     </div>
 
     <!-- Condition status read-through -->
@@ -613,7 +749,7 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
       <button onclick="copyNP()" id="copyNPBtn" class="btn bn bf mt-3 hidden">複製申請文字</button>
     </div>
 
-    <div class="mt-4 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。</div>
+    <div class="mt-4 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。版本日期：2026年3月</div>
   </div>
 
   <!-- ══════ TAB 4 藥物對照 ══════ -->
@@ -870,162 +1006,152 @@ table.inner tr:not(:last-child) td{border-bottom:1px solid #f1f5f9;}
     <div class="text-xs text-slate-400 leading-relaxed mb-3">
       Johnston SRD, et al. <em>Ann Oncol</em>. 2026;37(2):155-165. ｜ Crown J, et al. <em>ESMO Open</em>. 2025;10(11):105858.
     </div>
-    <div class="mt-2 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。</div>
+    <div class="mt-2 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。版本日期：2026年3月</div>
   </div><!-- /tab4 -->
 
-  <!-- ══════ TAB 5 共同決策 ══════ -->
+  <!-- ══════ TAB 5 自費決策參考 ══════ -->
   <div id="tab5" class="tab-content">
 
-    <div class="card">
-      <div class="card-title">共同決策輔助工具</div>
-      <div class="card-sub">以情境式左右比較協助醫師與病人做出個人化選擇</div>
-      <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs text-slate-600">以下為臨床情境分析，非絕對適應症，須綜合病人整體狀況、意願與經濟考量決策。</div>
-    </div>
-
-    <!-- Left-right header -->
-    <div class="grid grid-cols-2 gap-2 mb-1 px-1">
-      <div class="bg-blue-900 text-white rounded-xl px-3 py-2 text-center">
-        <div class="text-xs font-black">Abemaciclib</div>
-        <div class="text-xs opacity-70">BID · 2年 · 健保</div>
+    <!-- Drug header -->
+    <div class="grid grid-cols-2 gap-2 mb-3">
+      <div style="background:#1e3a6e;border-radius:14px;padding:12px 14px;color:white;">
+        <div style="font-size:0.9rem;font-weight:900;margin-bottom:2px;">捷癌寧®</div>
+        <div style="font-size:0.7rem;opacity:0.7;line-height:1.4;">Abemaciclib<br>每天早晚各一顆 · 服藥 2 年</div>
+        <span style="display:inline-block;margin-top:6px;font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:3px;background:#f0fdf4;color:#166534;">符合條件可健保給付</span>
       </div>
-      <div class="bg-slate-600 text-white rounded-xl px-3 py-2 text-center">
-        <div class="text-xs font-black">Ribociclib</div>
-        <div class="text-xs opacity-70">QD · 3年 · 全自費</div>
+      <div style="background:#475569;border-radius:14px;padding:12px 14px;color:white;">
+        <div style="font-size:0.9rem;font-weight:900;margin-bottom:2px;">擊癌利®</div>
+        <div style="font-size:0.7rem;opacity:0.7;line-height:1.4;">Ribociclib<br>每天一顆（服 3 週停 1 週）· 服藥 3 年</div>
+        <span style="display:inline-block;margin-top:6px;font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(255,255,255,0.15);color:white;">全程自費</span>
       </div>
     </div>
 
-    <!-- Row cards: side-by-side comparison by topic -->
+    <!-- 療效 -->
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;font-size:0.74rem;color:#475569;line-height:1.6;margin-bottom:10px;">
+      ⚠️ <strong>重要說明：</strong>捷癌寧與擊癌利的數據分別來自 MonarchE 及 NATALEE 兩個獨立臨床試驗，兩者試驗族群、設計及評估方式存在差異，目前亦尚無頭對頭（head-to-head）隨機對照試驗，因此本頁所列數值<strong>不應直接相互比較</strong>，僅供參考。
+    </div>
 
-    <!-- 適應症/健保 -->
+    <div class="card p-0 mb-2" style="overflow:hidden;">
+      <div style="font-size:0.72rem;font-weight:800;color:#94a3b8;letter-spacing:0.04em;padding:10px 14px 0;">療效比較</div>
+      <div class="grid grid-cols-2" style="gap:0;">
+        <div style="background:#f0f7ff;border-right:1px solid #e2e8f0;padding:10px 12px;">
+          <div style="font-size:0.78rem;font-weight:800;color:#1e3a6e;margin-bottom:5px;">捷癌寧®</div>
+          <span style="display:inline-block;font-size:0.66rem;font-weight:700;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;border-radius:3px;padding:1px 6px;margin-bottom:4px;">✅ 已證實改善存活</span><br>
+          <div style="font-size:0.78rem;color:#334155;line-height:1.6;">追蹤 7 年，降低復發風險並<strong>顯著延長存活</strong>（統計上有意義）。停藥後 5 年療效仍持續。</div>
+        </div>
+        <div style="background:#f8fafc;padding:10px 12px;">
+          <div style="font-size:0.78rem;font-weight:800;color:#475569;margin-bottom:5px;">擊癌利®</div>
+          <span style="display:inline-block;font-size:0.66rem;font-weight:700;background:#fffbeb;color:#92400e;border:1px solid #fde68a;border-radius:3px;padding:1px 6px;margin-bottom:4px;">⚠️ 存活數據尚未成熟</span><br>
+          <div style="font-size:0.78rem;color:#334155;line-height:1.6;">追蹤 5 年，降低復發療效相近，<strong>但存活數據尚未達統計顯著</strong>，仍需更長追蹤。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 適應症費用 -->
+    <div class="card p-0 mb-2" style="overflow:hidden;">
+      <div style="font-size:0.72rem;font-weight:800;color:#94a3b8;letter-spacing:0.04em;padding:10px 14px 0;">台灣適應症 / 費用</div>
+      <div class="grid grid-cols-2" style="gap:0;">
+        <div style="background:#f0f7ff;border-right:1px solid #e2e8f0;padding:10px 12px;">
+          <div style="font-size:0.78rem;font-weight:800;color:#1e3a6e;margin-bottom:5px;">捷癌寧®</div>
+          <div style="font-size:0.78rem;color:#334155;line-height:1.6;">台灣 TFDA 核准適應症（含淋巴結陽性 1–3 顆且 Ki-67 ≥ 20%）。符合健保條件可<strong>大幅降低費用</strong>。估計自費：約 168 萬元 / 2 年（約 7 萬元/月）。</div>
+          <div style="margin-top:7px;font-size:0.73rem;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 10px;">✅ 符合條件可健保給付<br><span style="font-size:0.67rem;color:#92400e;">⚠️ 淋巴結陽性 1–3 顆 + Ki-67 ≥20% 條件：健保無給付</span></div>
+        </div>
+        <div style="background:#f8fafc;padding:10px 12px;">
+          <div style="font-size:0.78rem;font-weight:800;color:#475569;margin-bottom:5px;">擊癌利®</div>
+          <div style="font-size:0.78rem;color:#334155;line-height:1.6;">台灣目前<strong>無早期乳癌適應症</strong>，需全程自費。估計費用：約 70 萬元 / 3 年（約 2 萬元/月）。</div>
+          <div style="margin-top:7px;font-size:0.73rem;color:#475569;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:8px 10px;">❌ 無健保給付，全自費</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 搭配荷爾蒙 -->
+    <div class="card p-0 mb-2" style="overflow:hidden;">
+      <div style="font-size:0.72rem;font-weight:800;color:#94a3b8;letter-spacing:0.04em;padding:10px 14px 0;">與荷爾蒙藥物搭配</div>
+      <div class="grid grid-cols-2" style="gap:0;">
+        <div style="background:#f0f7ff;border-right:1px solid #e2e8f0;padding:10px 12px;">
+          <div style="font-size:0.78rem;font-weight:800;color:#1e3a6e;margin-bottom:5px;">捷癌寧®</div>
+          <div style="font-size:0.78rem;color:#334155;line-height:1.6;">可搭配<strong>芳香環酶抑制劑或 Tamoxifen</strong>。停經前後皆有試驗數據。</div>
+        </div>
+        <div style="background:#f8fafc;padding:10px 12px;">
+          <div style="font-size:0.78rem;font-weight:800;color:#475569;margin-bottom:5px;">擊癌利®</div>
+          <div style="font-size:0.78rem;color:#334155;line-height:1.6;">只能搭配<strong>芳香環酶抑制劑</strong>。<strong style="color:#b91c1c;">不可與 Tamoxifen 合用</strong>（增加心律不整風險）。</div>
+          <div style="margin-top:7px;font-size:0.73rem;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:8px 10px;">⚠️ 若您目前使用 Tamoxifen，請告知醫師。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 副作用 -->
+    <div class="card p-0 mb-2" style="overflow:hidden;">
+      <div style="font-size:0.72rem;font-weight:800;color:#94a3b8;letter-spacing:0.04em;padding:10px 14px 0;">主要副作用</div>
+      <div class="grid grid-cols-2" style="gap:0;">
+        <div style="background:#f0f7ff;border-right:1px solid #e2e8f0;padding:10px 12px;">
+          <div style="font-size:0.78rem;font-weight:800;color:#1e3a6e;margin-bottom:6px;">捷癌寧®</div>
+          <div style="font-size:0.77rem;color:#334155;line-height:1.55;">
+            <div style="display:flex;gap:6px;padding:4px 0;border-bottom:1px solid #e8f0ff;"><span>🚽</span><div><strong>腹瀉（約 8 成病患，嚴重約 1 成）</strong><br>多在第 1 個月，止瀉藥通常可改善；降劑量不影響療效。</div></div>
+            <div style="display:flex;gap:6px;padding:4px 0;border-bottom:1px solid #e8f0ff;"><span>🩸</span><div><strong>白血球偏低（嚴重 Grade 3/4 約 18%）</strong><br>需定期回院抽血監測。</div></div>
+            <div style="display:flex;gap:6px;padding:4px 0;border-bottom:1px solid #e8f0ff;"><span>🫁</span><div><strong>ILD 間質性肺病（約 3%）</strong><br>新發咳嗽、呼吸困難需告知醫師。</div></div>
+            <div style="display:flex;gap:6px;padding:4px 0;"><span>🦵</span><div><strong>VTE 靜脈血栓栓塞（約 3%）</strong><br>腿部腫脹疼痛、呼吸急促請立即就醫。</div></div>
+          </div>
+        </div>
+        <div style="background:#f8fafc;padding:10px 12px;">
+          <div style="font-size:0.78rem;font-weight:800;color:#475569;margin-bottom:6px;">擊癌利®</div>
+          <div style="font-size:0.77rem;color:#334155;line-height:1.55;">
+            <div style="display:flex;gap:6px;padding:4px 0;border-bottom:1px solid #e2e8f0;"><span>🩸</span><div><strong>白血球明顯偏低（45% 嚴重）</strong><br>需定期回院抽血監測。</div></div>
+            <div style="display:flex;gap:6px;padding:4px 0;border-bottom:1px solid #e2e8f0;"><span>🧪</span><div><strong>肝功能異常（8% 嚴重）</strong><br>需定期回院抽血監測（高於捷癌寧）。</div></div>
+            <div style="display:flex;gap:6px;padding:4px 0;border-bottom:1px solid #e2e8f0;"><span>❤️</span><div><strong>心電圖 QTc 延長（約 6% 需調整劑量）</strong><br>需定期回院心電圖監測；避免 QT 延長藥物。</div></div>
+            <div style="display:flex;gap:6px;padding:4px 0;"><span>🫁</span><div><strong>ILD 間質性肺病（約 1.5%）</strong><br>新發咳嗽、呼吸困難需告知醫師。</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 適合哪些情況 -->
+    <div class="card p-0 mb-2" style="overflow:hidden;">
+      <div style="font-size:0.72rem;font-weight:800;color:#94a3b8;letter-spacing:0.04em;padding:10px 14px 0;">適合哪些情況選擇</div>
+      <div class="grid grid-cols-2" style="gap:0;">
+        <div style="background:#f0f7ff;border-right:1px solid #e2e8f0;padding:10px 12px;">
+          <div style="font-size:0.78rem;font-weight:800;color:#1e3a6e;margin-bottom:5px;">較適合捷癌寧®</div>
+          <div style="font-size:0.77rem;color:#334155;line-height:1.6;">
+            <div style="display:flex;gap:5px;margin-bottom:4px;"><span>✅</span><span>符合健保給付條件</span></div>
+            <div style="display:flex;gap:5px;margin-bottom:4px;"><span>✅</span><span>目前使用 Tamoxifen</span></div>
+            <div style="display:flex;gap:5px;margin-bottom:4px;"><span>✅</span><span>有心臟疾病或心律不整病史</span></div>
+            <div style="display:flex;gap:5px;margin-bottom:4px;"><span>✅</span><span>重視已有 7 年存活獲益數據</span></div>
+            <div style="display:flex;gap:5px;"><span>✅</span><span>希望 2 年後完成療程</span></div>
+          </div>
+        </div>
+        <div style="background:#f8fafc;padding:10px 12px;">
+          <div style="font-size:0.78rem;font-weight:800;color:#475569;margin-bottom:5px;">考慮擊癌利®（自費）</div>
+          <div style="font-size:0.77rem;color:#334155;line-height:1.6;">
+            <div style="display:flex;gap:5px;margin-bottom:4px;"><span>🔹</span><span>不符健保，但符合 NATALEE 試驗範圍</span></div>
+            <div style="display:flex;gap:5px;margin-bottom:4px;"><span>🔹</span><span>對腹瀉有強烈顧慮（腹瀉率 15% vs 84%）</span></div>
+            <div style="display:flex;gap:5px;"><span>🔹</span><span>能接受定期心電圖及較頻繁監測</span></div>
+          </div>
+          <div style="margin-top:7px;font-size:0.73rem;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:8px 10px;">⚠️ 台灣目前無此適應症，請與醫師充分討論再決定。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 快速決策 -->
     <div class="card p-3 mb-2">
-      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">適應症 / 健保</div>
-      <div class="grid grid-cols-2 gap-2">
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-xs">
-          <div class="font-bold text-blue-900 mb-1">✅ 台灣適應症 + 健保給付</div>
-          <div class="text-slate-600">符合健保條件可零自費。健保申請需完成化療+放療，且手術後 ≤16 個月。</div>
-        </div>
-        <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs">
-          <div class="font-bold text-slate-700 mb-1">❌ 台灣無早期乳癌適應症</div>
-          <div class="text-slate-500">全程自費；使用前需充分告知並記錄共同決策。</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 搭配內分泌治療 -->
-    <div class="card p-3 mb-2">
-      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">搭配內分泌治療</div>
-      <div class="grid grid-cols-2 gap-2">
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-xs">
-          <div class="font-bold text-blue-900 mb-1">AI 或 Tamoxifen 皆可</div>
-          <div class="text-slate-600">MonarchE 納入兩種；停經前使用 Tamoxifen 者唯一有試驗支持的選擇。</div>
-        </div>
-        <div class="bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-xs">
-          <div class="font-bold text-amber-800 mb-1">⚠️ 僅限 NSAI</div>
-          <div class="text-slate-600">FDA 仿單明確：<em>not indicated for concomitant use with tamoxifen</em>。停經前使用 Tamoxifen 者<strong>不可選用</strong>。</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- OS 數據 -->
-    <div class="card p-3 mb-2">
-      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">整體存活（OS）</div>
-      <div class="grid grid-cols-2 gap-2">
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-xs">
-          <div class="font-bold text-blue-900 mb-1">✅ 達統計顯著獲益</div>
-          <div class="text-slate-600">HR 0.842（95% CI 0.722–0.981），P=0.0273，追蹤 7 年</div>
-        </div>
-        <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs">
-          <div class="font-bold text-slate-700 mb-1">⚠️ 數據未成熟</div>
-          <div class="text-slate-500">HR 0.800（0.637–1.003），P=0.026（one-sided, informational），追蹤 5 年</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 主要副作用 -->
-    <div class="card p-3 mb-2">
-      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">主要副作用型態</div>
-      <div class="grid grid-cols-2 gap-2">
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-xs space-y-1">
-          <div class="font-bold text-blue-900">腹瀉（84%，G3: 8%）</div>
-          <div class="text-slate-600">首次多在第 8 天，正確使用 Loperamide 可管理。<br>降劑量不影響療效（HR 0.905）。</div>
-          <div class="text-slate-600">嗜中性球 G3 首次無需降劑量，G3 復發或 G4 才降階。</div>
-          <div class="text-slate-600">ILD G1/2 無需調整，G3/4 永久停藥。</div>
-          <div class="text-slate-600">VTE 任何等級→暫停，穩定後可恢復。</div>
-        </div>
-        <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs space-y-1">
-          <div class="font-bold text-slate-700">嗜中性球低下（94%，G3/4: 45%）</div>
-          <div class="text-slate-600">需頻繁 CBC 監測；嗜中性球 G4 降劑量至 200mg。</div>
-          <div class="font-bold text-slate-700 mt-1">肝毒性（ALT G3/4: 8%）</div>
-          <div class="text-slate-600">高於 Abemaciclib（2.5%）；G4 永久停藥。</div>
-          <div class="font-bold text-slate-700 mt-1">QTc 延長</div>
-          <div class="text-slate-600">需定期 ECG；QTc&gt;500ms 降劑量；再次發生永久停藥。</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 特定病人族群 -->
-    <div class="card p-3 mb-2">
-      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">特定族群考量</div>
-      <div class="grid grid-cols-2 gap-2">
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-xs space-y-1.5">
-          <div><span class="font-bold text-blue-900">心臟問題 / QTc 風險高</span><br><span class="text-slate-600">不需 ECG 監測，無 QTc 顧慮，更安全</span></div>
-          <div><span class="font-bold text-blue-900">多重用藥（CYP3A 交互作用）</span><br><span class="text-slate-600">強/中效 CYP3A 抑制劑需降劑量；無 QT 延長藥物顧慮，比 Ribociclib 藥物交互作用層面更簡單</span></div>
-          <div><span class="font-bold text-blue-900">肝功能異常風險者</span><br><span class="text-slate-600">ALT G3 發生率較低（2.5% vs 8%）；Child-Pugh C 降頻率為 QD 仍可用</span></div>
-          <div><span class="font-bold text-blue-900">較短療程需求</span><br><span class="text-slate-600">2 年完成，停藥後 5 年仍見持續獲益</span></div>
-        </div>
-        <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs space-y-1.5">
-          <div><span class="font-bold text-slate-700">不符健保但符合 NATALEE 族群</span><br><span class="text-slate-500">Stage IIA N0 + Grade 3 / Ki-67 ≥20% 等，NATALEE 有數據</span></div>
-          <div><span class="font-bold text-slate-700">對腹瀉有強烈顧慮</span><br><span class="text-slate-500">腹瀉率 15%（vs 84%）；但須接受嗜中性球低下及 ECG 監測</span></div>
-          <div><span class="font-bold text-slate-700">腎功能不全（重度）</span><br><span class="text-slate-500">Ribociclib 重度腎功能不全起始 200mg；Abemaciclib 重度腎功能不全資料不足</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 費用 -->
-    <div class="card p-3 mb-2">
-      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">費用估算</div>
-      <div class="grid grid-cols-2 gap-2">
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-xs">
-          <div class="font-bold text-blue-900 text-base">約 168 萬元</div>
-          <div class="text-slate-600">24 個月，約 7 萬元/月</div>
-          <div class="text-emerald-700 font-bold mt-1">符合條件，可健保給付</div>
-        </div>
-        <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs">
-          <div class="font-bold text-slate-700 text-base">約 70 萬元</div>
-          <div class="text-slate-500">36 個月，約 2 萬元/月</div>
-          <div class="text-slate-500 mt-1">全程自費</div>
-        </div>
-      </div>
-      <div class="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2">各醫療院所實際定價不同，以上為估算參考值，實際費用請依就醫院所報價為準。</div>
-    </div>
-
-    <!-- Quick decision flow -->
-    <div class="card p-3 mb-4">
-      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">快速決策流程</div>
+      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">決策流程參考</div>
       <div class="space-y-2 text-xs">
-        <div class="flex gap-2">
-          <div class="w-6 h-6 rounded-full bg-blue-900 text-white flex items-center justify-center font-black flex-shrink-0 text-xs">1</div>
-          <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 flex-1"><span class="font-bold text-blue-900">符合健保條件？</span><br>是 → <strong>Abemaciclib（健保）</strong></div>
-        </div>
-        <div class="flex gap-2">
-          <div class="w-6 h-6 rounded-full bg-blue-800 text-white flex items-center justify-center font-black flex-shrink-0 text-xs">2</div>
-          <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 flex-1"><span class="font-bold text-blue-900">使用 Tamoxifen？</span><br>是 → <strong>Abemaciclib（自費）</strong>；Ribociclib <em>not indicated</em></div>
-        </div>
-        <div class="flex gap-2">
-          <div class="w-6 h-6 rounded-full bg-blue-700 text-white flex items-center justify-center font-black flex-shrink-0 text-xs">3</div>
-          <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 flex-1"><span class="font-bold text-blue-900">心臟病 / QTc 風險 / 多種 QT 延長藥物？</span><br>是 → <strong>Abemaciclib（自費）</strong></div>
-        </div>
-        <div class="flex gap-2">
-          <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-black flex-shrink-0 text-xs">4</div>
-          <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 flex-1"><span class="font-bold text-blue-900">肝功能異常風險高 / 多重藥物交互作用顧慮？</span><br>是 → 傾向 <strong>Abemaciclib</strong>（ALT G3 較低）</div>
-        </div>
-        <div class="flex gap-2">
-          <div class="w-6 h-6 rounded-full bg-slate-500 text-white flex items-center justify-center font-black flex-shrink-0 text-xs">5</div>
-          <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 flex-1"><span class="font-bold text-slate-700">腹瀉強烈不耐 + 可接受 ECG 監測？</span><br>考慮 <strong>Ribociclib（自費）</strong>，需告知台灣無適應症</div>
-        </div>
+        <div class="flex gap-2"><div class="w-6 h-6 rounded-full flex items-center justify-center font-black flex-shrink-0 text-xs text-white" style="background:#1e3a6e;min-width:24px;">1</div><div class="bg-blue-50 border border-blue-200 rounded-lg p-2 flex-1"><span class="font-bold text-blue-900">符合健保條件？</span><br>是 → <strong>捷癌寧®（健保）</strong></div></div>
+        <div class="flex gap-2"><div class="w-6 h-6 rounded-full flex items-center justify-center font-black flex-shrink-0 text-xs text-white" style="background:#1e40af;min-width:24px;">2</div><div class="bg-blue-50 border border-blue-200 rounded-lg p-2 flex-1"><span class="font-bold text-blue-900">目前使用 Tamoxifen？</span><br>是 → <strong>捷癌寧®（自費）</strong>；擊癌利® 不可使用</div></div>
+        <div class="flex gap-2"><div class="w-6 h-6 rounded-full flex items-center justify-center font-black flex-shrink-0 text-xs text-white" style="background:#2563eb;min-width:24px;">3</div><div class="bg-blue-50 border border-blue-200 rounded-lg p-2 flex-1"><span class="font-bold text-blue-900">有心臟疾病 / 心律不整病史？</span><br>是 → <strong>捷癌寧®（自費）</strong></div></div>
+        <div class="flex gap-2"><div class="w-6 h-6 rounded-full flex items-center justify-center font-black flex-shrink-0 text-xs text-white" style="background:#475569;min-width:24px;">4</div><div class="bg-slate-50 border border-slate-200 rounded-lg p-2 flex-1"><span class="font-bold text-slate-700">腹瀉顧慮且可接受定期心電圖監測？</span><br>考慮 <strong>擊癌利®（自費）</strong>，需告知台灣無適應症</div></div>
       </div>
     </div>
-    <div class="mt-4 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。</div>
+
+    <!-- SDM QR code -->
+    <div class="card p-3 mb-2">
+      <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">決策參考單張 QR Code</div>
+      <div class="flex items-center gap-4">
+        <div id="sdm_qr_canvas" style="flex-shrink:0;"></div>
+        <button onclick="window.open('https://onco-tools.github.io/hr_adjuvant/sdm.html','_blank')" class="btn bn text-xs" style="padding:8px 18px;">📄 開啟獨立頁面</button>
+      </div>
+    </div>
+
+    <div class="mt-4 mb-2 px-1 text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-4">本工具依據 Verzenio® 仿單 (TFDA, 2025-04-11)、Kisqali® 仿單 (US FDA, 2025-09-16)、TFDA 核准適應症、Abemaciclib 健保署給付規範、MonarchE 試驗 protocol 製作，供醫護人員專業參考。內容不得取代個別臨床判斷，實際用藥決策請依現行仿單及健保規範為準。版本日期：2026年3月</div>
 
   </div><!-- /tab5 -->
 
@@ -1040,18 +1166,14 @@ function switchTab(id,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   E(id).classList.add('active'); btn.classList.add('active');
   if(id==='tab3') buildNP();
+  if(id==='tab2') setTimeout(genQR,150);
+  if(id==='tab5') setTimeout(initSdmQR,150);
 }
-function switchSubTab(id,btnId){
-  document.querySelectorAll('.sub-content').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.sub-btn').forEach(b=>b.classList.remove('active'));
-  E(id).classList.add('active'); E(btnId).classList.add('active');
-  if(id==='ae_pt') initPatientQR();
-}
-function initPatientQR(){
-  const c=E('qr_canvas'); if(!c||c.innerHTML!=='') return;
-  const defaultUrl=window.location.href.replace(/[^/]*$/,'verzenio_patient.html');
-  const urlInput=E('qr_url'); if(urlInput&&!urlInput.value) urlInput.value=defaultUrl;
-  _renderQR(defaultUrl,'捷癌寧居家照護衛教單張');
+
+function initSdmQR(){
+  const c=E('sdm_qr_canvas'); if(!c||c.innerHTML!=='') return;
+  if(typeof QRCode==='undefined'){setTimeout(initSdmQR,300);return;}
+  new QRCode(c,{text:'https://onco-tools.github.io/hr_adjuvant/sdm.html',width:90,height:90,colorDark:'#0c2340',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
 }
 function toggleAcc(id,btn){ E(id).classList.toggle('open'); btn.classList.toggle('open'); }
 function toggleTblSec(rowId,btnId,lblId){
@@ -1074,8 +1196,7 @@ function runAll(){
   const ki67=V('c_neo_ki67')||V('c_adj_ki67');
   const risk=neoR||adjR;
   const base=['c_erpr','c_her2','c_chemo','c_radio','c_endo','c_surg'].every(V);
-  const noExcl=!V('c_exc_male')&&!V('c_exc_erpr');
-  const isNHI=base&&risk&&noExcl;
+  const isNHI=base&&risk;
   const isSelf=!isNHI&&(risk||ki67);
   const rb=E('result_block');
   const anyC=document.querySelectorAll('#tab1 input[type=checkbox]:checked').length>0;
@@ -1087,10 +1208,12 @@ function runAll(){
     E('result_main').style.color='#166534'; E('result_main').textContent='符合健保給付條件';
     E('result_sub').style.color='#16a34a'; E('result_sub').textContent='所有條件均已符合';
     E('result_missing').classList.add('hidden');
+    E('result_goto').classList.remove('hidden');
   } else if(isSelf){
     rb.style.cssText='border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;background:#fefce8;border:2px solid #fde68a;';
     E('result_main').style.color='#92400e'; E('result_main').textContent='建議評估自費使用';
     E('result_sub').style.color='#a16207'; E('result_sub').textContent='已符合高風險或 Ki-67 條件，但不符健保資格';
+    E('result_goto').classList.add('hidden');
     const mis=[];
     if(!V('c_erpr')&&!V('c_exc_erpr'))mis.push('未勾選【ER/PR > 30%】');
     if(!V('c_her2'))mis.push('未勾選【HER2 陰性】');
@@ -1099,8 +1222,6 @@ function runAll(){
     if(!V('c_endo'))mis.push('未勾選【內分泌治療 ≤ 12 週】');
     if(!V('c_surg'))mis.push('未勾選【手術後 ≤ 16 個月】');
     if(!risk)mis.push('未達健保高風險條件（Ki-67 ≥20% 僅為自費條件）');
-    if(V('c_exc_male'))mis.push('排除條件【男性患者】');
-    if(V('c_exc_erpr'))mis.push('排除條件【ER/PR ≤ 30%】');
     const rm=E('result_missing'); rm.classList.remove('hidden');
     rm.innerHTML='<div style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:10px;text-align:left;font-size:0.75rem;color:#78350f;margin-top:8px"><div style="font-weight:700;margin-bottom:4px">無法申請健保原因：</div><ul style="list-style:disc;padding-left:16px;margin:0">'+mis.map(m=>`<li>${m}</li>`).join('')+'</ul></div>';
   } else {
@@ -1108,6 +1229,7 @@ function runAll(){
     E('result_main').style.color='#64748b'; E('result_main').textContent='請繼續勾選評估條件';
     E('result_sub').style.color='#94a3b8'; E('result_sub').textContent='';
     E('result_missing').classList.add('hidden');
+    E('result_goto').classList.add('hidden');
   }
 }
 
@@ -1188,7 +1310,6 @@ function buildNP(){
   const grade=E('lab_grade')?.value; const size=E('lab_size')?.value;
   const reg=E('lab_chemo_reg')?.value; const rtSite=E('lab_rt_site')?.value;
   const et=E('lab_et')?.value;
-  const pid=E('np_pid')?.value||'';
   const surg=E('np_surg')?.value||E('d_surg')?.value||'';
   const chemo=E('np_chemo_end')?.value||'';
   const radio=E('np_radio_end')?.value||'';
@@ -1222,7 +1343,6 @@ function buildNP(){
     stEl.className='p-3 rounded-lg border text-sm font-semibold bg-emerald-50 border-emerald-300 text-emerald-800 mb-3';
     misEl.classList.add('hidden');
     let c=1,t='';
-    t+=`Patient: ${pid||'[病歷號/姓名]'}\n`;
     t+=`Diagnosis: HR+/HER2− Early Breast Cancer   Stage: [填寫]\n`;
     t+=`Application: Abemaciclib (Verzenio®) — First-time\n`;
     t+=`Surgery: ${surg||'[填寫]'}   Chemo end: ${chemo||'[填寫]'}   RT end: ${radio||'[填寫]'}\n\n`;
@@ -1287,11 +1407,20 @@ function showToast(msg){
   setTimeout(()=>t.style.opacity=0,2500);
 }
 
-function switchSubTab(id,btnId){
-  document.querySelectorAll('.sub-content').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.sub-btn').forEach(b=>b.classList.remove('active'));
-  E(id).classList.add('active'); E(btnId).classList.add('active');
-}
+// Init header QR on load
+document.addEventListener('DOMContentLoaded',()=>{
+  const c=E('header_qr'); if(!c) return;
+  function tryHeaderQR(){
+    if(typeof QRCode==='undefined'){setTimeout(tryHeaderQR,300);return;}
+    new QRCode(c,{text:'https://onco-tools.github.io/hr_adjuvant/',width:52,height:52,colorDark:'#334155',colorLight:'#f8fafc',correctLevel:QRCode.CorrectLevel.L});
+  }
+  tryHeaderQR();
+  // Hash navigation: if URL has #tab5, switch to that tab
+  if(location.hash==='#tab5'){
+    const btn=document.querySelector('.tab-btn:last-child');
+    if(btn) btn.click();
+  }
+});
 
 function labCheck(){
   const er=parseFloat(E('lab_er')?.value)||0;
@@ -1398,12 +1527,19 @@ function downloadQR(){
   a.href=img.tagName==='IMG'?img.src:img.toDataURL('image/png');
   a.click();
 }
-// Auto-init QR when switching to patient sub-tab
+// Sub-tab switcher
 function switchSubTab(id,btnId){
   document.querySelectorAll('.sub-content').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.sub-btn').forEach(b=>b.classList.remove('active'));
-  E(id).classList.add('active'); E(btnId).classList.add('active');
-  if(id==='ae_pt') setTimeout(genQR,100);
+  E(id).classList.add('active');
+  const ptBtn=E('ae_pt_btn'); const hcpBtn=E('ae_hcp_btn');
+  const activeStyle='flex:1;background:#0c2340;color:white;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-family:inherit;font-size:0.77rem;font-weight:700;text-align:center;transition:all 0.15s;box-shadow:0 2px 6px rgba(12,35,64,0.2);';
+  const inactiveStyle='flex:1;background:white;color:#334155;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 12px;cursor:pointer;font-family:inherit;font-size:0.77rem;font-weight:700;text-align:center;transition:all 0.15s;';
+  if(id==='ae_pt'){
+    ptBtn.style.cssText=activeStyle; hcpBtn.style.cssText=inactiveStyle;
+    setTimeout(genQR,100);
+  } else {
+    hcpBtn.style.cssText=activeStyle; ptBtn.style.cssText=inactiveStyle;
+  }
 }
 </script>
 </body>

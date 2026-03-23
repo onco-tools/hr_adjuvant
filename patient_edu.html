@@ -15,7 +15,14 @@
 <title>捷癌寧 Verzenio® 用藥衛教指引</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
+@media print{
+  .toc,.no-print{display:none!important;}
+  body{background:white!important;}
+  .hero{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .sec{break-inside:avoid;}
+}
 :root{
   --navy:#0c2340;--navy2:#1a3a5c;
   --blue:#2563eb;--sky:#e0f2fe;
@@ -142,14 +149,27 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 <body>
 
 <div class="hero">
-  <div class="hero-pill">📋 Verzenio® 居家照護指引</div>
-  <div class="hero-title">捷癌寧<em>用藥衛教</em></div>
-  <div class="hero-sub">依據 TFDA 核准仿單（2025-04-11）製作，如有疑問請聯繫護理師或醫師。</div>
-  <div class="hero-badges">
-    <div class="hb">💊 每日兩次</div>
-    <div class="hb">📅 療程 2 年</div>
-    <div class="hb">🏥 早期乳癌輔助治療</div>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+    <div style="flex:1;">
+      <div class="hero-pill">📋 Verzenio® 居家照護指引</div>
+      <div class="hero-title">捷癌寧<em>用藥衛教</em></div>
+      <div class="hero-sub">依據 TFDA 核准仿單（2025-04-11）製作，如有疑問請聯繫護理師或醫師。</div>
+      <div class="hero-badges">
+        <div class="hb">💊 每日兩次</div>
+        <div class="hb">📅 療程 2 年</div>
+        <div class="hb">🏥 早期乳癌輔助治療</div>
+      </div>
+    </div>
+    <!-- QR code in hero -->
+    <div style="flex-shrink:0;text-align:center;">
+      <div id="hero_qr" style="background:white;border-radius:10px;padding:6px;width:90px;height:90px;display:flex;align-items:center;justify-content:center;"></div>
+      <div style="font-size:0.6rem;color:rgba(255,255,255,0.6);margin-top:4px;line-height:1.3;">掃描開啟<br>此衛教頁面</div>
+    </div>
   </div>
+  <!-- Print button -->
+  <button onclick="window.print()" style="margin-top:16px;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:99px;padding:7px 16px;font-size:0.76rem;font-weight:700;font-family:inherit;cursor:pointer;">
+    🖨️ 列印此衛教單張
+  </button>
 </div>
 
 <div class="toc" id="toc">
@@ -175,7 +195,7 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
     <div class="sec-body">
       <div class="info-row"><div class="ir-icon">💊</div><div>捷癌寧（Abemaciclib，商品名 Verzenio®）是一種<strong>標靶口服藥物</strong>，屬於 CDK4/6 抑制劑，能阻斷癌細胞分裂生長所需的特定蛋白質。</div></div>
       <div class="info-row"><div class="ir-icon">🩷</div><div>適用於<strong>荷爾蒙受體（HR）陽性、HER2 陰性</strong>、淋巴結陽性的早期乳癌輔助治療，與內分泌療法（芳香環酶抑制劑或 tamoxifen）合併使用。</div></div>
-      <div class="info-row"><div class="ir-icon">📉</div><div>大型研究（MonarchE）顯示，捷癌寧能<strong>顯著降低乳癌復發風險</strong>，長達 7 年的追蹤數據也確認<strong>對整體存活率有益</strong>。</div></div>
+      <div class="info-row"><div class="ir-icon">📉</div><div>大型研究（MonarchE）顯示，捷癌寧能<strong>顯著降低乳癌復發風險</strong>，長達 7 年的追蹤數據也確認對整體存活率有益。</div></div>
       <div class="info-row"><div class="ir-icon">⏳</div><div>標準療程為持續服用 <strong>2 年</strong>，或直到疾病復發、出現無法耐受的副作用為止。</div></div>
       <div class="a-blue"><span>💡</span><span>請遵照醫師指示服藥，<strong>不可隨意增減劑量或自行停藥。</strong>有任何疑慮，請先與醫療團隊討論。</span></div>
     </div>
@@ -210,20 +230,19 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
     </div>
     <div class="sec-body">
       <div class="a-warn" style="margin-bottom:12px;margin-top:0;"><span>⚡</span><span><strong>大便一開始變稀，馬上服用止瀉藥</strong>，不要等到嚴重才處理。同時大量補充水分。</span></div>
-      <div style="font-size:0.78rem;font-weight:700;color:var(--slate);margin-bottom:8px;">💊 Loperamide 止瀉藥用法</div>
+      <div style="font-size:0.78rem;font-weight:700;color:var(--slate);margin-bottom:8px;">💊 Loperamide（速瀉停）止瀉藥用法</div>
       <div class="lop-flow">
-        <div class="lop-step"><div class="lop-num">2 <span style="font-size:0.85rem;font-weight:700;">顆</span></div><div class="lop-lbl">第一次腹瀉<br>立刻吃</div></div>
+        <div class="lop-step"><div class="lop-num">2</div><div class="lop-lbl">第一次腹瀉<br>立刻吃</div></div>
         <div class="lop-arrow">→</div>
-        <div class="lop-step"><div class="lop-num">1 <span style="font-size:0.85rem;font-weight:700;">顆</span></div><div class="lop-lbl">之後每<br>2 小時吃</div></div>
+        <div class="lop-step"><div class="lop-num">1</div><div class="lop-lbl">之後每<br>2 小時吃</div></div>
         <div class="lop-arrow">→</div>
-        <div class="lop-step lop-max"><div class="lop-num">8 <span style="font-size:0.85rem;font-weight:700;">顆</span></div><div class="lop-lbl">每天<br>上限</div></div>
+        <div class="lop-step lop-max"><div class="lop-num">8</div><div class="lop-lbl">每天<br>上限</div></div>
       </div>
       <div style="font-size:0.69rem;color:var(--muted);margin-bottom:12px;text-align:center;">（每顆 2mg；每日最多 8 顆）</div>
       <div style="font-size:0.78rem;font-weight:700;color:var(--slate);margin-bottom:8px;">依嚴重程度決定是否暫停藥</div>
       <div class="grade-row g1"><span class="gbadge gb1">Grade 1</span><span class="grade-desc">每天增加 &lt; 4 次</span><span class="grade-act ga-ok">繼續服藥 ✓</span></div>
       <div class="grade-row g2"><span class="gbadge gb2">Grade 2</span><span class="grade-desc">增加 4–6 次，24hr 未改善</span><span class="grade-act ga-warn">先暫停，<br>聯絡護理師</span></div>
-      <div class="grade-row g3" style="margin-bottom:12px;"><span class="gbadge gb3">Grade 3/4</span><span class="grade-desc">增加 ≥ 7 次 / 需住院</span><span class="grade-act ga-bad">立刻停藥<br>回診</span></div>
-      <div class="a-green"><span>✅</span><span>研究顯示，<strong>主動調降劑量與維持原劑量相比，長期療效沒有顯著差異</strong>（HR: 0.905）。若在服用止瀉藥與調整飲食後腹瀉仍未緩解，<strong>請主動告知醫師</strong>——適時調整劑量，才能順利完成 2 年療程，<strong>達到最佳的預防復發效果。</strong></span></div>
+      <div class="grade-row g3" style="margin-bottom:0;"><span class="gbadge gb3">Grade 3/4</span><span class="grade-desc">增加 ≥ 7 次 / 需住院</span><span class="grade-act ga-bad">立刻停藥<br>回診</span></div>
     </div>
   </div>
 
@@ -402,6 +421,14 @@ window.addEventListener('scroll',()=>{
   secs.forEach((id,i)=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<=off)cur=i;});
   btns.forEach((b,i)=>b.classList.toggle('active',i===cur));
 },{passive:true});
+
+// Generate self-referencing QR in hero
+(function(){
+  const url='https://onco-tools.github.io/hr_adjuvant/patient_edu.html';
+  const c=document.getElementById('hero_qr');
+  if(!c||typeof QRCode==='undefined') return;
+  new QRCode(c,{text:url,width:78,height:78,colorDark:'#0c2340',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+})();
 </script>
 </body>
 </html>
